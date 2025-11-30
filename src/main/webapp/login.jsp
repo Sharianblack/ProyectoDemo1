@@ -5,6 +5,38 @@
   Time: 9:25
   To change this template use File | Settings | File Templates.
 --%>
+<%
+    // ========================================================================
+    // VALIDACIÓN: Si ya hay sesión activa, redirigir a su panel correspondiente
+    // ========================================================================
+    // NOTA: Esto es DIFERENTE a las otras páginas
+    // Aquí NO bloqueamos el acceso, sino que REDIRIGIMOS si ya está logueado
+
+    if (session != null && session.getAttribute("user") != null) {
+        // El usuario YA está logueado, obtener su rol
+        String rolActual = (String) session.getAttribute("rol");
+
+        if (rolActual != null) {
+            // Redirigir según su rol
+            String rolLower = rolActual.trim().toLowerCase();
+
+            switch (rolLower) {
+                case "admin":
+                    response.sendRedirect("PIAdmin.jsp");
+                    return;
+                case "cliente":
+                    response.sendRedirect("paginaInicio.jsp");
+                    return;
+                case "veterinario":
+                    response.sendRedirect("PIVeterinario.jsp");
+                    return;
+            }
+        }
+    }
+
+    // Si llegamos aquí, NO hay sesión activa → Mostrar formulario de login
+    // ========================================================================
+%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,7 +44,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema</title>
-    <link rel="stylesheet" type="text/css" href="login.css">
+    <link rel="stylesheet" type="text/css" href="estilos/login.css">
 </head>
 <body>
 <div class="login-wrapper">

@@ -1,16 +1,19 @@
 package model;
 
+import java.sql.Timestamp;
+
 public class Usuario {
 
     // CAMPOS QUE COINCIDEN CON LA TABLA USUARIOS
-    private int id; // Se mantendrá 'id' en Java aunque en BD sea 'id_usuario'
+    private int id;
     private String nombre;
-    private String correo; // Coincide con la columna 'Correo' (se usa como username/email)
-    private String passwordHash; // Coincide con la columna 'PasswordHash'
+    private String correo;
+    private String passwordHash;
     private String rol;
     private String telefono;
     private String direccion;
-
+    private boolean activo; // NUEVO CAMPO para activar/desactivar usuarios
+    private Timestamp fechaRegistro; // NUEVO CAMPO para fecha de creación
 
     // ----------------------
     // 1. CONSTRUCTORES
@@ -18,12 +21,14 @@ public class Usuario {
 
     // Constructor vacío
     public Usuario() {
+        this.activo = true; // Por defecto, los usuarios están activos
     }
 
     // Constructor para Login (username y password)
     public Usuario(String correo, String passwordHash) {
         this.correo = correo;
         this.passwordHash = passwordHash;
+        this.activo = true;
     }
 
     // Constructor completo (para Registro)
@@ -34,24 +39,38 @@ public class Usuario {
         this.rol = rol;
         this.telefono = telefono;
         this.direccion = direccion;
+        this.activo = true;
     }
 
-    // Constructor para mapeo desde la BD (incluye id)
-    public Usuario(int id, String nombre, String correo, String rol, String telefono, String direccion) {
+    // Constructor para mapeo desde la BD (incluye id y activo)
+    public Usuario(int id, String nombre, String correo, String rol, String telefono, String direccion, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
         this.rol = rol;
         this.telefono = telefono;
         this.direccion = direccion;
+        this.activo = activo;
     }
 
+    // Constructor completo con todos los campos
+    public Usuario(int id, String nombre, String correo, String passwordHash, String rol,
+                   String telefono, String direccion, boolean activo, Timestamp fechaRegistro) {
+        this.id = id;
+        this.nombre = nombre;
+        this.correo = correo;
+        this.passwordHash = passwordHash;
+        this.rol = rol;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.activo = activo;
+        this.fechaRegistro = fechaRegistro;
+    }
 
     // ----------------------
     // 2. GETTERS Y SETTERS
     // ----------------------
 
-    // ID (BD: id_usuario)
     public int getId() {
         return id;
     }
@@ -60,7 +79,6 @@ public class Usuario {
         this.id = id;
     }
 
-    // Nombre (BD: Nombre)
     public String getNombre() {
         return nombre;
     }
@@ -69,7 +87,6 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    // Correo (BD: Correo)
     public String getCorreo() {
         return correo;
     }
@@ -78,8 +95,6 @@ public class Usuario {
         this.correo = correo;
     }
 
-    // Password (BD: PasswordHash)
-    // Se usa 'passwordHash' en Java para reflejar que es el hash y no el texto plano.
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -88,7 +103,6 @@ public class Usuario {
         this.passwordHash = passwordHash;
     }
 
-    // Rol (BD: Rol)
     public String getRol() {
         return rol;
     }
@@ -97,7 +111,6 @@ public class Usuario {
         this.rol = rol;
     }
 
-    // Teléfono (BD: Telefono)
     public String getTelefono() {
         return telefono;
     }
@@ -106,7 +119,6 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    // Dirección (BD: Direccion)
     public String getDireccion() {
         return direccion;
     }
@@ -115,8 +127,48 @@ public class Usuario {
         this.direccion = direccion;
     }
 
+    // NUEVO: Getter y Setter para activo
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    // NUEVO: Getter y Setter para fechaRegistro
+    public Timestamp getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Timestamp fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
     // ----------------------
-    // 3. TOSTRING
+    // 3. MÉTODOS AUXILIARES
+    // ----------------------
+
+    /**
+     * Devuelve el estado como texto para mostrar en la UI
+     */
+    public String getEstadoTexto() {
+        return activo ? "Activo" : "Inactivo";
+    }
+
+    /**
+     * Devuelve un badge HTML con el estado
+     */
+    public String getEstadoBadge() {
+        if (activo) {
+            return "<span class='badge badge-success'>Activo</span>";
+        } else {
+            return "<span class='badge badge-danger'>Inactivo</span>";
+        }
+    }
+
+    // ----------------------
+    // 4. TOSTRING
     // ----------------------
 
     @Override
@@ -126,6 +178,8 @@ public class Usuario {
                 ", nombre='" + nombre + '\'' +
                 ", correo='" + correo + '\'' +
                 ", rol='" + rol + '\'' +
+                ", activo=" + activo +
+                ", fechaRegistro=" + fechaRegistro +
                 '}';
     }
 }

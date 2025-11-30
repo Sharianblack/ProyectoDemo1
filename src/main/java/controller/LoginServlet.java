@@ -24,46 +24,66 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Obtener parámetros del formulario
-        // NOTA: Asumiendo que el campo del formulario sigue llamándose "username"
-        // Si tu formulario usa "correo", cambia "username" en la siguiente línea.
-        String correo = request.getParameter("username"); // <-- Variable renombrada a 'correo'
+        String correo = request.getParameter("username");
         String password = request.getParameter("password");
 
-        System.out.println("Intento de login - Correo: " + correo); // <-- Usando 'correo'
+        System.out.println("Intento de login - Correo: " + correo);
 
         // Validar que los campos no estén vacíos
         if (correo == null || correo.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
-            request.setAttribute("errorMessage", " Por favor complete todos los campos");
+            request.setAttribute("errorMessage", "Por favor complete todos los campos");
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
 
-        // Validar usuario con la base de datos (UsuarioDao ya fue corregido para usar Correo y PasswordHash)
+        // Validar usuario con la base de datos
         Usuario user = userDAO.validateUser(correo, password);
 
         if (user != null) {
             // Login exitoso
-            System.out.println(" Login exitoso para: " + correo);
+            System.out.println("✓ Login exitoso para: " + correo + " - Rol: " + user.getRol());
+
+            // Crear sesión y guardar datos del usuario
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-
-            // CAMBIO CLAVE: Usamos getCorreo() en lugar de getUsername()
             session.setAttribute("username", user.getCorreo());
-
-            // El ID sigue siendo válido ya que se mantuvo el nombre 'id' en el modelo
+            session.setAttribute("nombre", user.getNombre());
             session.setAttribute("userId", user.getId());
-
-            // También puedes guardar el Rol si lo necesitas:
             session.setAttribute("rol", user.getRol());
 
-            response.sendRedirect("paginaInicio.jsp");
+            // Redirección según el rol del usuario
+            String rol = user.getRol().trim().toLowerCase();
+
+            switch (rol) {
+                case "admin":
+                    System.out.println("→ Redirigiendo a Panel de Administrador");
+                    response.sendRedirect("PIAdmin.jsp");
+                    break;
+
+                case "cliente":
+                    System.out.println("→ Redirigiendo a Panel de Cliente");
+                    response.sendRedirect("paginaInicio.jsp");
+                    break;
+
+                case "veterinario":
+                    System.out.println("→ Redirigiendo a Panel de Veterinario");
+                    response.sendRedirect("PIVeterinario.jsp");
+                    break;
+
+                default:
+                    // Si el rol no coincide con ninguno esperado
+                    System.out.println("✗ Rol desconocido: '" + user.getRol() + "'");
+                    session.invalidate();
+                    request.setAttribute("errorMessage", "El rol '" + user.getRol() + "' no está configurado. Contacte al administrador.");
+                    request.getRequestDispatcher("login.jsp").forward(request, response);
+                    break;
+            }
         }
-        else
-        {
+        else {
             // Login fallido
-            System.out.println(" Login fallido para: " + correo);
-            request.setAttribute("errorMessage", " Usuario o contraseña incorrectos");
+            System.out.println("✗ Login fallido para: " + correo);
+            request.setAttribute("errorMessage", "Usuario o contraseña incorrectos");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
