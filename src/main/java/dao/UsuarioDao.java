@@ -91,7 +91,45 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 3. OBTENER USUARIO POR ID
+    // 3. OBTENER USUARIO POR CORREO
+    // ========================================================================
+    public Usuario obtenerPorCorreo(String correo) {
+        Usuario user = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = ConexionBDD.getConnection();
+            String sql = "SELECT id_usuario, Nombre, Correo, Rol, Telefono, Direccion, activo, fecha_registro " +
+                    "FROM Usuarios WHERE Correo = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, correo);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new Usuario();
+                user.setId(rs.getInt("id_usuario"));
+                user.setNombre(rs.getString("Nombre"));
+                user.setCorreo(rs.getString("Correo"));
+                user.setRol(rs.getString("Rol"));
+                user.setTelefono(rs.getString("Telefono"));
+                user.setDireccion(rs.getString("Direccion"));
+                user.setActivo(rs.getBoolean("activo"));
+                user.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                System.out.println("✓ Usuario encontrado por correo: " + correo);
+            }
+        } catch (SQLException e) {
+            System.out.println("✗ Error al obtener usuario por correo");
+            e.printStackTrace();
+        } finally {
+            cerrarRecursos(rs, ps, conn);
+        }
+        return user;
+    }
+
+    // ========================================================================
+    // 4. OBTENER USUARIO POR ID
     // ========================================================================
     public Usuario obtenerPorId(int id) {
         Usuario user = null;

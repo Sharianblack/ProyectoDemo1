@@ -1,14 +1,11 @@
-/*
- * Archivo: styles.css (o el nombre que uses)
- * Descripción: Estilos para la página de login basados en el diseño proporcionado.
- */
+/* login.css */
 
 :root {
-    /* Variables de Color (ajustadas al diseño púrpura/magenta) */
-    --color-primary: #8a2be2; /* Azul violeta */
-    --color-secondary: #ff007f; /* Magenta brillante */
-    --color-background-dark: #3700b3; /* Púrpura oscuro para el fondo derecho */
-    --color-background-light: #f0e6fa; /* Fondo general claro */
+    /* Variables de Color */
+    --color-primary: #8a2be2;
+    --color-secondary: #ff007f;
+    --color-background-dark: #3700b3;
+    --color-background-light: #f0e6fa;
     --color-text-light: #ffffff;
     --color-text-dark: #333333;
     --color-button: #ff007f;
@@ -17,7 +14,6 @@
 }
 
 body {
-    /* Configuración base */
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
@@ -25,24 +21,23 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: var(--color-background-light); /* Fondo general muy claro */
+    background-color: var(--color-background-light);
     box-sizing: border-box;
 }
 
-/* Contenedor principal para simular la división de la página */
 .login-wrapper {
     display: flex;
-    width: 800px; /* Ancho total del módulo de login */
+    width: 800px;
     min-height: 500px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    overflow: hidden; /* Importante para los bordes */
+    overflow: hidden;
 }
 
 /* Sección de Bienvenida (Lado Izquierdo) */
 .welcome-section {
-    flex: 1; /* Ocupa la mitad del espacio */
-    background: linear-gradient(135deg, var(--color-secondary) 0%, #a052ff 100%); /* Degradado rosado/púrpura */
+    flex: 1;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, #a052ff 100%);
     color: var(--color-text-light);
     padding: 40px;
     display: flex;
@@ -51,7 +46,6 @@ body {
     align-items: center;
     text-align: center;
     position: relative;
-    /* Simulación de las formas orgánicas con un pseudo-elemento o con la imagen */
 }
 
 .welcome-section h1 {
@@ -67,21 +61,14 @@ body {
     margin-bottom: 30px;
 }
 
-/* Marcador de posición para la imagen del cohete (la debes añadir en el HTML) */
 .rocket-image-placeholder {
-    /* Si decides poner la imagen directamente en el HTML de la sección de bienvenida,
-       asegúrate de darle un ancho y alto adecuados, por ejemplo: */
-    /*
-    width: 150px;
-    height: auto;
-    */
     margin-top: 20px;
 }
 
 /* Contenedor del Formulario (Lado Derecho) */
 .login-container {
-    flex: 1; /* Ocupa la otra mitad del espacio */
-    background-color: var(--color-background-dark); /* Fondo púrpura oscuro */
+    flex: 1;
+    background-color: var(--color-background-dark);
     color: var(--color-text-light);
     padding: 40px;
     display: flex;
@@ -94,35 +81,33 @@ body {
     margin-bottom: 30px;
     text-align: center;
     color: var(--color-text-light);
-    font-weight: 300; /* Ligeramente más delgado para simular el diseño */
+    font-weight: 300;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
-/* Estilos para los grupos de formulario */
 .form-group {
     margin-bottom: 20px;
     position: relative;
 }
 
 .form-group label {
-    display: none; /* Ocultamos el label para usar solo los iconos si se desea */
+    display: none;
     font-size: 0.9em;
     margin-bottom: 5px;
     font-weight: 600;
 }
 
-/* Inputs de texto y contraseña */
 .form-group input[type="text"],
 .form-group input[type="password"] {
     width: 100%;
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+    background-color: rgba(255, 255, 255, 0.9);
     color: var(--color-text-dark);
     font-size: 1em;
-    box-sizing: border-box; /* Asegura que el padding no cambie el ancho total */
+    box-sizing: border-box;
 }
 
 .form-group input::placeholder {
@@ -134,14 +119,13 @@ body {
     box-shadow: 0 0 0 2px var(--color-secondary);
 }
 
-/* Botón de Ingresar */
 button[type="submit"] {
     width: 100%;
     padding: 12px;
-    background-color: var(--color-button); /* El color magenta del diseño */
+    background-color: var(--color-button);
     color: var(--color-text-light);
     border: none;
-    border-radius: 25px; /* Bordes redondeados como en la imagen */
+    border-radius: 25px;
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
@@ -154,7 +138,6 @@ button[type="submit"]:hover {
     background-color: var(--color-button-hover);
 }
 
-/* Mensaje de Error (Estilo discreto) */
 .error-message {
     background-color: var(--color-error);
     color: var(--color-text-light);
@@ -162,4 +145,42 @@ button[type="submit"]:hover {
     margin-bottom: 20px;
     border-radius: 5px;
     text-align: center;
+}
+
+/* =========================================
+   AJUSTES ADICIONALES PARA ENLACES Y TEXTOS
+   (Necesarios porque el fondo ahora es oscuro)
+   ========================================= */
+
+.forgot-password-link {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.forgot-password-link a {
+    color: rgba(255, 255, 255, 0.8); /* Blanco transparente */
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.forgot-password-link a:hover {
+    color: var(--color-secondary); /* Magenta al pasar el mouse */
+    text-decoration: underline;
+}
+
+.test-users {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Línea sutil */
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6); /* Texto gris claro */
+    text-align: center;
+}
+
+.test-users code {
+    background: rgba(0,0,0,0.3);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #fff;
 }

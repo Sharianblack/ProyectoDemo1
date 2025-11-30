@@ -5,80 +5,106 @@
   Time: 9:25
   To change this template use File | Settings | File Templates.
 --%>
+<%--
+  Página de Login
+--%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <%
     // ========================================================================
-    // VALIDACIÓN: Si ya hay sesión activa, redirigir a su panel correspondiente
+    // VALIDACIÓN DE SESIÓN (Lógica Java intacta)
     // ========================================================================
-    // NOTA: Esto es DIFERENTE a las otras páginas
-    // Aquí NO bloqueamos el acceso, sino que REDIRIGIMOS si ya está logueado
-
     if (session != null && session.getAttribute("user") != null) {
-        // El usuario YA está logueado, obtener su rol
         String rolActual = (String) session.getAttribute("rol");
-
         if (rolActual != null) {
-            // Redirigir según su rol
             String rolLower = rolActual.trim().toLowerCase();
-
             switch (rolLower) {
-                case "admin":
-                    response.sendRedirect("PIAdmin.jsp");
-                    return;
-                case "cliente":
-                    response.sendRedirect("paginaInicio.jsp");
-                    return;
-                case "veterinario":
-                    response.sendRedirect("PIVeterinario.jsp");
-                    return;
+                case "admin": response.sendRedirect("PJAdmin.jsp"); return;
+                case "cliente": response.sendRedirect("paginaInicio.jsp"); return;
+                case "veterinario": response.sendRedirect("PJVeterinario.jsp"); return;
             }
         }
     }
-
-    // Si llegamos aquí, NO hay sesión activa → Mostrar formulario de login
-    // ========================================================================
 %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema</title>
+    <title>Login - Veterinaria Bellavista</title>
     <link rel="stylesheet" type="text/css" href="estilos/login.css">
 </head>
 <body>
+
 <div class="login-wrapper">
 
     <div class="welcome-section">
-        <h1>Bienvenido Veteriniaria "Bellavista"</h1>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <div>
+            <h1>Veterinaria<br>"Bellavista"</h1>
+            <p>Gestión integral para el cuidado de tus mascotas.</p>
+        </div>
 
         <div class="rocket-image-placeholder">
-            <img src="tu-imagen-de-cohete.png" alt="Cohete de Lanzamiento" style="width: 150px; height: auto;">
+            <div style="font-size: 6rem;">🐾</div>
         </div>
+
+        <p style="font-size: 0.8em; opacity: 0.8;">Tu confianza, nuestro compromiso.</p>
     </div>
 
     <div class="login-container">
-        <h2>USER LOGIN</h2> <%
-        String errorMessage = (String) request.getAttribute("errorMessage");
-        if (errorMessage != null) {
-    %>
-        <div class="error-message"><%= errorMessage %></div>
+        <h2>USER LOGIN</h2>
+
+        <%
+            String errorMessage = (String) request.getAttribute("errorMessage");
+            if (errorMessage != null) {
+        %>
+        <div class="error-message">
+            ⚠️ <%= errorMessage %>
+        </div>
         <% } %>
 
         <form action="LoginServlet" method="post">
             <div class="form-group">
-                <label for="username">Usuario:</label>
-                <input type="text" id="username" name="username" placeholder="Username" required>
+                <label for="username">Usuario</label>
+                <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="📧 Correo Electrónico"
+                        required
+                        autocomplete="username">
             </div>
 
             <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <label for="password">Contraseña</label>
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="🔒 Contraseña"
+                        required
+                        autocomplete="current-password">
             </div>
 
-            <button type="submit">Login</button> </form>
+            <button type="submit">INGRESAR</button>
+        </form>
+
+        <div class="forgot-password-link">
+            <a href="solicitarRecuperacion.jsp">
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
+
+        <div class="test-users">
+            <p>Usuarios de prueba:</p>
+            <div style="margin-top: 5px;">
+                Admin: <code>admin</code> / <code>12345</code><br>
+                Vet: <code>vet@test.com</code> / <code>12345</code>
+            </div>
+        </div>
     </div>
 </div>
+
 </body>
 </html>
