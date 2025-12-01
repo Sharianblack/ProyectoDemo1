@@ -1,8 +1,6 @@
 package util;
 
-// ========================================================================
-// IMPORTS DE JAKARTA (NO javax)
-// ========================================================================
+
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
@@ -327,12 +325,11 @@ public class EmailUtil {
      * Método main para probar el envío de correos
      * Ejecuta esta clase directamente para verificar que la configuración funciona
      */
-   public static void main(String[] args) {
+/*   public static void main(String[] args) {
         System.out.println("=== PRUEBA DE ENVÍO DE CORREO ===");
         System.out.println("Usando Jakarta Mail API");
         System.out.println("");
 
-        // 👇 CAMBIAR ESTE CORREO PARA PROBAR
         String destinatarioPrueba = "dsmn2005gmail.com";
 
         System.out.println("Enviando correo de prueba a: " + destinatarioPrueba);
@@ -362,5 +359,5 @@ public class EmailUtil {
             System.out.println("3. Que tengas habilitada la verificación en 2 pasos en Gmail");
             System.out.println("4. Que las librerías Jakarta Mail estén en el classpath");
         }
-    }
+    } */
 }

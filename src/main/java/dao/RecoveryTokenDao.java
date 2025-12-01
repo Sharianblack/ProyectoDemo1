@@ -10,9 +10,7 @@ import java.util.Base64;
  */
 public class RecoveryTokenDao {
 
-    // ========================================================================
-    // 1. GENERAR TOKEN ÚNICO Y SEGURO
-    // ========================================================================
+
     /**
      * Genera un token aleatorio de 64 caracteres
      */
@@ -23,9 +21,7 @@ public class RecoveryTokenDao {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    // ========================================================================
-    // 2. CREAR NUEVO TOKEN DE RECUPERACIÓN
-    // ========================================================================
+
     /**
      * Crea un nuevo token de recuperación para un usuario
      * @param userId ID del usuario
@@ -77,9 +73,7 @@ public class RecoveryTokenDao {
         return null;
     }
 
-    // ========================================================================
-    // 3. VALIDAR TOKEN
-    // ========================================================================
+
     /**
      * Valida que un token sea válido (no usado, no expirado)
      * @param token Token a validar
@@ -117,9 +111,7 @@ public class RecoveryTokenDao {
         return userId;
     }
 
-    // ========================================================================
-    // 4. MARCAR TOKEN COMO USADO
-    // ========================================================================
+
     /**
      * Marca un token como usado después de restablecer la contraseña
      */
@@ -152,9 +144,7 @@ public class RecoveryTokenDao {
         return success;
     }
 
-    // ========================================================================
-    // 5. LIMPIAR TOKENS EXPIRADOS
-    // ========================================================================
+
     /**
      * Elimina tokens expirados o ya usados (mantenimiento)
      * Se puede ejecutar periódicamente
@@ -187,9 +177,7 @@ public class RecoveryTokenDao {
         return eliminados;
     }
 
-    // ========================================================================
-    // 6. OBTENER INFO DEL TOKEN (para debugging)
-    // ========================================================================
+
     /**
      * Obtiene información detallada de un token (para debugging)
      */

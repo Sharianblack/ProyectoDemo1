@@ -65,10 +65,10 @@
             <p>Ver y gestionar citas asignadas</p>
         </div>
 
-        <div class="vet-card">
-            <div class="icon">🐕</div>
-            <h3>Pacientes</h3>
-            <p>Consultar información de mascotas</p>
+        <div class="vet-card" onclick="location.href='VeterinarioClienteServlet?action=listar'" style="cursor: pointer;">
+            <div class="icon">👥</div>
+            <h3>Gestión de Clientes</h3>
+            <p>Registrar y gestionar clientes</p>
         </div>
 
         <div class="vet-card">
