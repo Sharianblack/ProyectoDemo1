@@ -168,7 +168,45 @@ public class UsuarioServlet extends HttpServlet {
             boolean creado = usuarioDao.crearUsuario(nuevoUsuario);
 
             if (creado) {
-                request.setAttribute("success", "Usuario '" + nombre + "' creado exitosamente");
+                // ========================================================================
+                // ENVIAR CORREO DE BIENVENIDA AL NUEVO USUARIO
+                // ========================================================================
+                try {
+                    // Construir URL del login
+                    String urlLogin = request.getScheme() + "://" +
+                            request.getServerName() + ":" +
+                            request.getServerPort() +
+                            request.getContextPath() + "/login.jsp";
+
+                    // Enviar correo de bienvenida
+                    boolean correoEnviado = util.EmailUtil.enviarCorreoBienvenida(
+                            correo.trim().toLowerCase(),
+                            nombre.trim(),
+                            rol,
+                            password, // Contraseña temporal
+                            urlLogin
+                    );
+
+                    if (correoEnviado) {
+                        request.setAttribute("success",
+                                "Usuario '" + nombre + "' creado exitosamente. " +
+                                        "✉️ Se ha enviado un correo de bienvenida a " + correo);
+                        System.out.println("✓ Correo de bienvenida enviado a: " + correo);
+                    } else {
+                        request.setAttribute("success",
+                                "Usuario '" + nombre + "' creado exitosamente. " +
+                                        "⚠️ No se pudo enviar el correo de bienvenida.");
+                        System.out.println("✗ Error al enviar correo de bienvenida a: " + correo);
+                    }
+                } catch (Exception emailEx) {
+                    // Si falla el correo, no afecta la creación del usuario
+                    System.err.println("✗ Error al enviar correo de bienvenida: " + emailEx.getMessage());
+                    request.setAttribute("success",
+                            "Usuario '" + nombre + "' creado exitosamente. " +
+                                    "⚠️ No se pudo enviar el correo de bienvenida (verifica la configuración de email).");
+                }
+                // ========================================================================
+
                 System.out.println("✓ Usuario creado: " + correo);
             } else {
                 request.setAttribute("error", "Error al crear el usuario");
