@@ -1,0 +1,29 @@
+/* =========================================
+   Archivo: estilos/veterinario_custom.css
+   Descripción: Estilos específicos para la vista del Veterinario
+   ========================================= */
+
+/* Sobrescribir navbar con gradiente verde/turquesa */
+.navbar {
+    background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+}
+
+/* Badge distintivo del rol Veterinario */
+.vet-badge {
+    background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Botón "Nuevo Cliente" personalizado */
+.btn-nuevo {
+    background: linear-gradient(135deg, #38f9d7 0%, #43e97b 100%);
+}
+
+.btn-nuevo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(56, 249, 215, 0.4);
+}

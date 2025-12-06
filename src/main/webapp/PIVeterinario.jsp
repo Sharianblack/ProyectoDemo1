@@ -37,8 +37,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Veterinario - Sistema Veterinaria</title>
 
-    <%-- INCLUIMOS EL ARCHIVO CSS EXTERNO --%>
-    <link rel="stylesheet" href="estilos/veterinario.css">
+    <link rel="stylesheet" type="text/css" href="estilos/veterinario.css">
 
 </head>
 <body>
@@ -59,10 +58,16 @@
     </div>
 
     <div class="vet-grid">
-        <div class="vet-card">
+        <div class="vet-card" onclick="location.href='CitaServlet?action=listar'">
             <div class="icon">📅</div>
             <h3>Mis Citas</h3>
             <p>Ver y gestionar citas asignadas</p>
+        </div>
+
+        <div class="vet-card" onclick="location.href='VeterinarioClienteServlet?action=listar'" style="cursor: pointer;">
+            <div class="icon">👥</div>
+            <h3>Gestión de Clientes</h3>
+            <p>Registrar y gestionar clientes</p>
         </div>
 
         <div class="vet-card">

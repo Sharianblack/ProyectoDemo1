@@ -1,8 +1,3 @@
-/* =========================================
-   Archivo: estilos/veterinario_dashboard.css
-   Descripción: Estilos para el panel principal del Veterinario
-   ========================================= */
-
 * {
     margin: 0;
     padding: 0;
@@ -11,11 +6,10 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
 
-/* NAVBAR */
 .navbar {
     background-color: rgba(255, 255, 255, 0.95);
     padding: 1rem 2rem;
@@ -26,7 +20,7 @@ body {
 }
 
 .navbar h1 {
-    color: #38f9d7;
+    color: #667eea;
     font-size: 1.5rem;
 }
 
@@ -38,16 +32,6 @@ body {
 
 .user-info span {
     color: #333;
-}
-
-.vet-badge {
-    display: inline-block;
-    background-color: #38f9d7;
-    color: #333;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
 }
 
 .logout-btn {
@@ -63,14 +47,12 @@ body {
     background-color: #dc2626;
 }
 
-/* CONTENEDOR PRINCIPAL */
 .content {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
-/* TARJETA DE BIENVENIDA */
 .welcome-card {
     background: white;
     padding: 2rem;
@@ -80,7 +62,7 @@ body {
 }
 
 .welcome-card h2 {
-    color: #38f9d7;
+    color: #667eea;
     margin-bottom: 1rem;
 }
 
@@ -90,40 +72,42 @@ body {
     margin-bottom: 0.5rem;
 }
 
-/* GRID DE TARJETAS DE MENÚ */
-.vet-grid {
+.info-badge {
+    display: inline-block;
+    background-color: #667eea;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
 }
 
-.vet-card {
+.feature-card {
     background: white;
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     text-align: center;
     transition: transform 0.3s;
-    cursor: pointer;
 }
 
-.vet-card:hover {
+.feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-.vet-card h3 {
-    color: #38f9d7;
+.feature-card h3 {
+    color: #667eea;
     margin-bottom: 0.5rem;
 }
 
-.vet-card p {
+.feature-card p {
     color: #666;
     font-size: 0.9rem;
-}
-
-.icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
 }

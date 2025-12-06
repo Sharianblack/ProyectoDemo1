@@ -1,3 +1,8 @@
+/* =========================================
+   Archivo: estilos/veterinario_dashboard.css
+   Descripción: Estilos para el panel principal del Veterinario
+   ========================================= */
+
 * {
     margin: 0;
     padding: 0;
@@ -10,6 +15,7 @@ body {
     min-height: 100vh;
 }
 
+/* NAVBAR */
 .navbar {
     background-color: rgba(255, 255, 255, 0.95);
     padding: 1rem 2rem;
@@ -37,7 +43,7 @@ body {
 .vet-badge {
     display: inline-block;
     background-color: #38f9d7;
-    color: #333; /* Color oscuro para resaltar sobre el color claro de fondo */
+    color: #333;
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -57,12 +63,14 @@ body {
     background-color: #dc2626;
 }
 
+/* CONTENEDOR PRINCIPAL */
 .content {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
+/* TARJETA DE BIENVENIDA */
 .welcome-card {
     background: white;
     padding: 2rem;
@@ -82,6 +90,7 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* GRID DE TARJETAS DE MENÚ */
 .vet-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
