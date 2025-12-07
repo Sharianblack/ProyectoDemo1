@@ -86,10 +86,19 @@
                     <select name="idCliente" id="idCliente" required onchange="cargarMascotas()">
                         <option value="">Selecciona un cliente...</option>
                         <% if (clientes != null) {
-                            for (String[] cliente : clientes) { %>
-                        <option value="<%= cliente[0] %>"
-                                data-mascotas="<%= cliente[4] %>">
-                            <%= cliente[1] %> - <%= cliente[2] %> (<%= cliente[4] %> mascotas)
+                            for (String[] cliente : clientes) {
+                                // cliente[0]=id_cliente (puede ser ""), cliente[5]=id_usuario (puede ser null), cliente[4]=num_mascotas
+                                String idClienteVal = cliente.length > 0 && cliente[0] != null ? cliente[0] : "";
+                                String idUsuarioVal = cliente.length > 5 && cliente[5] != null ? cliente[5] : (idClienteVal.isEmpty() ? "" : idClienteVal);
+                                String nombre = cliente.length > 1 ? cliente[1] : "";
+                                String correo = cliente.length > 2 ? cliente[2] : "";
+                                String numMascotas = cliente.length > 4 ? cliente[4] : "0";
+                        %>
+                        <option value="<%= (idClienteVal.isEmpty() ? idUsuarioVal : idClienteVal) %>"
+                                data-idcliente="<%= idClienteVal %>"
+                                data-idusuario="<%= idUsuarioVal %>"
+                                data-mascotas="<%= numMascotas %>">
+                            <%= nombre %> - <%= correo %> (<%= numMascotas %> mascotas)
                         </option>
                         <% }
                         } %>
@@ -198,16 +207,20 @@
         const mascotasContainer = document.getElementById('mascotasContainer');
         const mascotasSelect = document.getElementById('idMascota');
 
-        const idCliente = clienteSelect.value;
+        // Preferimos enviar id_cliente si está disponible, si no usamos id_usuario
+        const selectedOption = clienteSelect.options[clienteSelect.selectedIndex];
+        const idClienteAttr = selectedOption ? selectedOption.dataset.idcliente : '';
+        const idUsuarioAttr = selectedOption ? selectedOption.dataset.idusuario : '';
+        const idToSend = (idClienteAttr && idClienteAttr !== '') ? idClienteAttr : idUsuarioAttr;
 
-        if (!idCliente) {
+        if (!idToSend) {
             mascotasContainer.style.display = 'none';
             mascotasSelect.innerHTML = '<option value="">Primero selecciona un cliente</option>';
             return;
         }
 
         // Llamar al servidor para obtener mascotas
-        fetch('CitaServlet?action=getMascotas&idCliente=' + idCliente)
+        fetch('CitaServlet?action=getMascotas&idCliente=' + idToSend)
             .then(response => response.json())
             .then(mascotas => {
                 mascotasSelect.innerHTML = '<option value="">Selecciona una mascota...</option>';

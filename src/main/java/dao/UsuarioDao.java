@@ -392,6 +392,70 @@ public class UsuarioDao {
     }
 
     // ========================================================================
+    // 12. LISTAR CLIENTES (CON FALBACK SI LA TABLA 'clientes' NO EXISTE)
+    // ========================================================================
+    /**
+     * Devuelve una lista de usuarios con rol Cliente. Intenta usar la tabla 'clientes'
+     * para obtener sólo los clientes registrados en esa tabla; si falla, hace fallback
+     * a consultar directamente la tabla 'usuarios' filtrando por Rol='Cliente'.
+     */
+    public List<Usuario> listarClientes() {
+        List<Usuario> clientes = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = ConexionBDD.getConnection();
+            String sqlJoin = "SELECT u.id_usuario, u.Nombre, u.Correo, u.Rol, u.Telefono, u.Direccion, u.activo, u.fecha_registro " +
+                    "FROM clientes c JOIN usuarios u ON c.id_usuario = u.id_usuario WHERE u.activo = 1 ORDER BY u.Nombre";
+            try {
+                ps = conn.prepareStatement(sqlJoin);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setId(rs.getInt("id_usuario"));
+                    u.setNombre(rs.getString("Nombre"));
+                    u.setCorreo(rs.getString("Correo"));
+                    u.setRol(rs.getString("Rol"));
+                    u.setTelefono(rs.getString("Telefono"));
+                    u.setDireccion(rs.getString("Direccion"));
+                    u.setActivo(rs.getBoolean("activo"));
+                    u.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                    clientes.add(u);
+                }
+                return clientes;
+            } catch (SQLException ex) {
+                // Fallback: tabla 'clientes' no existe o query falló
+                cerrarRecursos(rs, ps, null);
+            }
+
+            String sqlUsuarios = "SELECT id_usuario, Nombre, Correo, Rol, Telefono, Direccion, activo, fecha_registro FROM usuarios WHERE activo = 1 AND (Rol = 'Cliente' OR Rol = 'cliente') ORDER BY Nombre";
+            ps = conn.prepareStatement(sqlUsuarios);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setId(rs.getInt("id_usuario"));
+                u.setNombre(rs.getString("Nombre"));
+                u.setCorreo(rs.getString("Correo"));
+                u.setRol(rs.getString("Rol"));
+                u.setTelefono(rs.getString("Telefono"));
+                u.setDireccion(rs.getString("Direccion"));
+                u.setActivo(rs.getBoolean("activo"));
+                u.setFechaRegistro(rs.getTimestamp("fecha_registro"));
+                clientes.add(u);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            cerrarRecursos(rs, ps, conn);
+        }
+
+        return clientes;
+    }
+
+    // ========================================================================
     // 11. MÉTODO AUXILIAR PARA CERRAR RECURSOS
     // ========================================================================
     private void cerrarRecursos(ResultSet rs, PreparedStatement ps, Connection conn) {
