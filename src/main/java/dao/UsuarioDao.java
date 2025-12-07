@@ -2,6 +2,7 @@ package dao;
 
 import model.Usuario;
 import util.ConexionBDD;
+import util.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 public class UsuarioDao {
 
     // ========================================================================
-    // 1. MÉTODO PARA VALIDAR LOGIN
+    // 1. MÉTODO PARA VALIDAR LOGIN (CON BCRYPT)
     // ========================================================================
     public Usuario validateUser(String username, String password) {
         Usuario user = null;
@@ -20,31 +21,55 @@ public class UsuarioDao {
 
         try {
             conn = ConexionBDD.getConnection();
-            // Solo permite login si el usuario está activo
-            String sql = "SELECT id_usuario, Nombre, Correo, Rol, Telefono, Direccion, activo " +
-                    "FROM Usuarios WHERE Correo = ? AND PasswordHash = ? AND activo = 1";
+
+            // 🔥 OBTENER EL HASH DE LA BD
+            String sql = "SELECT id_usuario, Nombre, Correo, PasswordHash, Rol, Telefono, Direccion, activo " +
+                    "FROM Usuarios WHERE Correo = ? AND activo = 1";
+
             ps = conn.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, password);
-
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                user = new Usuario();
-                user.setId(rs.getInt("id_usuario"));
-                user.setNombre(rs.getString("Nombre"));
-                user.setCorreo(rs.getString("Correo"));
-                user.setRol(rs.getString("Rol"));
-                user.setTelefono(rs.getString("Telefono"));
-                user.setDireccion(rs.getString("Direccion"));
-                user.setActivo(rs.getBoolean("activo"));
+                String storedHash = rs.getString("PasswordHash");
 
-                System.out.println("✓ Usuario encontrado: " + username);
+                // 🔥 VERIFICAR CONTRASEÑA CON BCRYPT
+                boolean passwordMatch;
+
+                if (PasswordUtil.isBCryptHash(storedHash)) {
+                    // Hash BCrypt - verificar con BCrypt
+                    passwordMatch = PasswordUtil.checkPassword(password, storedHash);
+                } else {
+                    // Hash antiguo (texto plano) - comparación directa
+                    passwordMatch = password.equals(storedHash);
+
+                    // 🔥 MIGRACIÓN AUTOMÁTICA: Si login exitoso, actualizar a BCrypt
+                    if (passwordMatch) {
+                        int userId = rs.getInt("id_usuario");
+                        actualizarPasswordABCrypt(userId, password);
+                        System.out.println("🔄 Contraseña migrada a BCrypt para usuario: " + username);
+                    }
+                }
+
+                if (passwordMatch) {
+                    user = new Usuario();
+                    user.setId(rs.getInt("id_usuario"));
+                    user.setNombre(rs.getString("Nombre"));
+                    user.setCorreo(rs.getString("Correo"));
+                    user.setRol(rs.getString("Rol"));
+                    user.setTelefono(rs.getString("Telefono"));
+                    user.setDireccion(rs.getString("Direccion"));
+                    user.setActivo(rs.getBoolean("activo"));
+
+                    System.out.println("✅ Usuario encontrado: " + username);
+                } else {
+                    System.out.println("❌ Contraseña incorrecta para: " + username);
+                }
             } else {
-                System.out.println("✗ Usuario no encontrado o inactivo");
+                System.out.println("❌ Usuario no encontrado o inactivo");
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error en validateUser");
+            System.out.println("❌ Error en validateUser");
             e.printStackTrace();
         } finally {
             cerrarRecursos(rs, ps, conn);
@@ -80,9 +105,9 @@ public class UsuarioDao {
                 user.setFechaRegistro(rs.getTimestamp("fecha_registro"));
                 usuarios.add(user);
             }
-            System.out.println("✓ Se listaron " + usuarios.size() + " usuarios");
+            System.out.println("✅ Se listaron " + usuarios.size() + " usuarios");
         } catch (SQLException e) {
-            System.out.println("✗ Error al listar usuarios");
+            System.out.println("❌ Error al listar usuarios");
             e.printStackTrace();
         } finally {
             cerrarRecursos(rs, ps, conn);
@@ -117,10 +142,10 @@ public class UsuarioDao {
                 user.setDireccion(rs.getString("Direccion"));
                 user.setActivo(rs.getBoolean("activo"));
                 user.setFechaRegistro(rs.getTimestamp("fecha_registro"));
-                System.out.println("✓ Usuario encontrado por correo: " + correo);
+                System.out.println("✅ Usuario encontrado por correo: " + correo);
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al obtener usuario por correo");
+            System.out.println("❌ Error al obtener usuario por correo");
             e.printStackTrace();
         } finally {
             cerrarRecursos(rs, ps, conn);
@@ -155,10 +180,10 @@ public class UsuarioDao {
                 user.setDireccion(rs.getString("Direccion"));
                 user.setActivo(rs.getBoolean("activo"));
                 user.setFechaRegistro(rs.getTimestamp("fecha_registro"));
-                System.out.println("✓ Usuario encontrado: ID " + id);
+                System.out.println("✅ Usuario encontrado: ID " + id);
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al obtener usuario por ID");
+            System.out.println("❌ Error al obtener usuario por ID");
             e.printStackTrace();
         } finally {
             cerrarRecursos(rs, ps, conn);
@@ -167,7 +192,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 4. CREAR NUEVO USUARIO
+    // 5. CREAR NUEVO USUARIO (CON BCRYPT)
     // ========================================================================
     public boolean crearUsuario(Usuario user) {
         Connection conn = null;
@@ -176,12 +201,17 @@ public class UsuarioDao {
 
         try {
             conn = ConexionBDD.getConnection();
+
+            // 🔥 ENCRIPTAR CONTRASEÑA ANTES DE GUARDAR
+            String passwordHash = PasswordUtil.hashPassword(user.getPasswordHash());
+
             String sql = "INSERT INTO Usuarios (Nombre, Correo, PasswordHash, Rol, Telefono, Direccion, activo) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
             ps = conn.prepareStatement(sql);
             ps.setString(1, user.getNombre());
             ps.setString(2, user.getCorreo());
-            ps.setString(3, user.getPasswordHash());
+            ps.setString(3, passwordHash); // 🔥 Guardar hash BCrypt
             ps.setString(4, user.getRol());
             ps.setString(5, user.getTelefono());
             ps.setString(6, user.getDireccion());
@@ -191,19 +221,62 @@ public class UsuarioDao {
             success = (result > 0);
 
             if (success) {
-                System.out.println("✓ Usuario creado: " + user.getCorreo());
+                System.out.println("✅ Usuario creado con contraseña encriptada: " + user.getCorreo());
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al crear usuario");
+            System.out.println("❌ Error al crear usuario");
             e.printStackTrace();
         } finally {
             cerrarRecursos(null, ps, conn);
         }
         return success;
     }
+// ========================================================================
+// AGREGA ESTE MÉTODO A TU UsuarioDao.java (después del método crearUsuario)
+// ========================================================================
 
+    /**
+     * Crea un usuario con un hash ya existente (NO vuelve a hashear)
+     * Se usa cuando el password ya viene hasheado (ej: verificación de email)
+     * @param user Usuario con passwordHash ya encriptado
+     * @return true si se creó correctamente
+     */
+    public boolean crearUsuarioConHashExistente(Usuario user) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean success = false;
+
+        try {
+            conn = ConexionBDD.getConnection();
+
+            String sql = "INSERT INTO Usuarios (Nombre, Correo, PasswordHash, Rol, Telefono, Direccion, activo) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, user.getNombre());
+            ps.setString(2, user.getCorreo());
+            ps.setString(3, user.getPasswordHash()); // 🔥 Usar el hash tal cual (NO hashear de nuevo)
+            ps.setString(4, user.getRol());
+            ps.setString(5, user.getTelefono());
+            ps.setString(6, user.getDireccion());
+            ps.setBoolean(7, user.isActivo());
+
+            int result = ps.executeUpdate();
+            success = (result > 0);
+
+            if (success) {
+                System.out.println("✅ Usuario creado con hash existente: " + user.getCorreo());
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Error al crear usuario con hash existente");
+            e.printStackTrace();
+        } finally {
+            cerrarRecursos(null, ps, conn);
+        }
+        return success;
+    }
     // ========================================================================
-    // 5. ACTUALIZAR USUARIO EXISTENTE
+    // 6. ACTUALIZAR USUARIO EXISTENTE
     // ========================================================================
     public boolean actualizarUsuario(Usuario user) {
         Connection conn = null;
@@ -227,10 +300,10 @@ public class UsuarioDao {
             success = (result > 0);
 
             if (success) {
-                System.out.println("✓ Usuario actualizado: ID " + user.getId());
+                System.out.println("✅ Usuario actualizado: ID " + user.getId());
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al actualizar usuario");
+            System.out.println("❌ Error al actualizar usuario");
             e.printStackTrace();
         } finally {
             cerrarRecursos(null, ps, conn);
@@ -239,7 +312,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 6. ACTUALIZAR CONTRASEÑA DE USUARIO
+    // 7. ACTUALIZAR CONTRASEÑA DE USUARIO (CON BCRYPT)
     // ========================================================================
     public boolean actualizarPassword(int userId, String newPassword) {
         Connection conn = null;
@@ -248,19 +321,23 @@ public class UsuarioDao {
 
         try {
             conn = ConexionBDD.getConnection();
+
+            // 🔥 ENCRIPTAR NUEVA CONTRASEÑA
+            String passwordHash = PasswordUtil.hashPassword(newPassword);
+
             String sql = "UPDATE Usuarios SET PasswordHash = ? WHERE id_usuario = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, newPassword);
+            ps.setString(1, passwordHash); // 🔥 Guardar hash BCrypt
             ps.setInt(2, userId);
 
             int result = ps.executeUpdate();
             success = (result > 0);
 
             if (success) {
-                System.out.println("✓ Contraseña actualizada para usuario ID: " + userId);
+                System.out.println("✅ Contraseña actualizada con BCrypt para usuario ID: " + userId);
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al actualizar contraseña");
+            System.out.println("❌ Error al actualizar contraseña");
             e.printStackTrace();
         } finally {
             cerrarRecursos(null, ps, conn);
@@ -269,7 +346,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 7. CAMBIAR ESTADO DEL USUARIO (Activar/Desactivar)
+    // 8. CAMBIAR ESTADO DEL USUARIO (Activar/Desactivar)
     // ========================================================================
     public boolean cambiarEstado(int userId, boolean activo) {
         Connection conn = null;
@@ -288,10 +365,10 @@ public class UsuarioDao {
 
             if (success) {
                 String estado = activo ? "activado" : "desactivado";
-                System.out.println("✓ Usuario " + estado + ": ID " + userId);
+                System.out.println("✅ Usuario " + estado + ": ID " + userId);
             }
         } catch (SQLException e) {
-            System.out.println("✗ Error al cambiar estado del usuario");
+            System.out.println("❌ Error al cambiar estado del usuario");
             e.printStackTrace();
         } finally {
             cerrarRecursos(null, ps, conn);
@@ -300,7 +377,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 8. BUSCAR USUARIOS (por nombre, correo o rol)
+    // 9. BUSCAR USUARIOS (por nombre, correo o rol)
     // ========================================================================
     public List<Usuario> buscarUsuarios(String criterio) {
         List<Usuario> usuarios = new ArrayList<>();
@@ -332,9 +409,9 @@ public class UsuarioDao {
                 user.setFechaRegistro(rs.getTimestamp("fecha_registro"));
                 usuarios.add(user);
             }
-            System.out.println("✓ Búsqueda: " + usuarios.size() + " usuarios encontrados");
+            System.out.println("✅ Búsqueda: " + usuarios.size() + " usuarios encontrados");
         } catch (SQLException e) {
-            System.out.println("✗ Error al buscar usuarios");
+            System.out.println("❌ Error al buscar usuarios");
             e.printStackTrace();
         } finally {
             cerrarRecursos(rs, ps, conn);
@@ -343,7 +420,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 9. VERIFICAR SI UN CORREO YA EXISTE
+    // 10. VERIFICAR SI UN CORREO YA EXISTE
     // ========================================================================
     public boolean correoExiste(String correo) {
         Connection conn = null;
@@ -367,7 +444,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 10. VERIFICAR SI UN CORREO YA EXISTE (EXCEPTO EL USUARIO ACTUAL)
+    // 11. VERIFICAR SI UN CORREO YA EXISTE (EXCEPTO EL USUARIO ACTUAL)
     // ========================================================================
     public boolean correoExisteExceptoUsuario(String correo, int userId) {
         Connection conn = null;
@@ -392,7 +469,36 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // 11. MÉTODO AUXILIAR PARA CERRAR RECURSOS
+    // PRIVADO: MIGRACIÓN AUTOMÁTICA A BCRYPT
+    // ========================================================================
+    /**
+     * Actualiza una contraseña antigua a BCrypt (migración automática)
+     */
+    private void actualizarPasswordABCrypt(int userId, String plainPassword) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+
+        try {
+            conn = ConexionBDD.getConnection();
+            String passwordHash = PasswordUtil.hashPassword(plainPassword);
+
+            String sql = "UPDATE Usuarios SET PasswordHash = ? WHERE id_usuario = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, passwordHash);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error al migrar contraseña a BCrypt");
+            e.printStackTrace();
+        } finally {
+            cerrarRecursos(null, ps, null);
+            try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+    }
+
+    // ========================================================================
+    // MÉTODO AUXILIAR PARA CERRAR RECURSOS
     // ========================================================================
     private void cerrarRecursos(ResultSet rs, PreparedStatement ps, Connection conn) {
         try {
@@ -405,7 +511,7 @@ public class UsuarioDao {
     }
 
     // ========================================================================
-    // MÉTODO LEGACY - Mantener por compatibilidad
+    // MÉTODOS LEGACY - Mantener por compatibilidad
     // ========================================================================
     @Deprecated
     public boolean registerUser(Usuario user) {

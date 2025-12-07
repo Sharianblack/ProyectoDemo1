@@ -2,6 +2,7 @@ package controller;
 
 import model.Usuario;
 import dao.UsuarioDao;
+import dao.EmailVerificationTokenDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,10 +17,12 @@ import java.util.List;
 public class UsuarioServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UsuarioDao usuarioDao;
+    private EmailVerificationTokenDao tokenDao;
 
     @Override
     public void init() {
         usuarioDao = new UsuarioDao();
+        tokenDao = new EmailVerificationTokenDao();
     }
 
     // ========================================================================
@@ -148,6 +151,24 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
+            // 🔥 VALIDAR FORMATO DE EMAIL
+            String mensajeValidacion = util.EmailValidator.validarConMensaje(correo);
+            if (mensajeValidacion != null) {
+                request.setAttribute("error", "❌ Correo inválido: " + mensajeValidacion);
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // 🔥 RECHAZAR EMAILS TEMPORALES
+            if (util.EmailValidator.esEmailTemporal(correo)) {
+                request.setAttribute("error", "❌ No se permiten correos temporales o desechables");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Normalizar el correo
+            correo = util.EmailValidator.normalizar(correo);
+
             // Verificar si el correo ya existe
             if (usuarioDao.correoExiste(correo)) {
                 request.setAttribute("error", "El correo '" + correo + "' ya está registrado");
@@ -155,11 +176,20 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
+            // 🔥 NUEVA VALIDACIÓN: Verificar si tiene token pendiente
+            if (tokenDao.tienTokenPendiente(correo)) {
+                request.setAttribute("warning",
+                        "⚠️ Este correo tiene una verificación pendiente del registro público. " +
+                                "El usuario debe completar esa verificación primero o esperar 24 horas.");
+                listarUsuarios(request, response);
+                return;
+            }
+
             // Crear usuario
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setNombre(nombre.trim());
-            nuevoUsuario.setCorreo(correo.trim().toLowerCase());
-            nuevoUsuario.setPasswordHash(password); // En producción, usar hash real
+            nuevoUsuario.setCorreo(correo);
+            nuevoUsuario.setPasswordHash(password);
             nuevoUsuario.setRol(rol);
             nuevoUsuario.setTelefono(telefono != null ? telefono.trim() : "");
             nuevoUsuario.setDireccion(direccion != null ? direccion.trim() : "");
@@ -168,49 +198,43 @@ public class UsuarioServlet extends HttpServlet {
             boolean creado = usuarioDao.crearUsuario(nuevoUsuario);
 
             if (creado) {
-                // ========================================================================
-                // ENVIAR CORREO DE BIENVENIDA AL NUEVO USUARIO
-                // ========================================================================
+                // Enviar correo de bienvenida
                 try {
-                    // Construir URL del login
                     String urlLogin = request.getScheme() + "://" +
                             request.getServerName() + ":" +
                             request.getServerPort() +
                             request.getContextPath() + "/login.jsp";
 
-                    // Enviar correo de bienvenida
                     boolean correoEnviado = util.EmailUtil.enviarCorreoBienvenida(
-                            correo.trim().toLowerCase(),
+                            correo,
                             nombre.trim(),
                             rol,
-                            password, // Contraseña temporal
+                            password,
                             urlLogin
                     );
 
                     if (correoEnviado) {
                         request.setAttribute("success",
-                                "Usuario '" + nombre + "' creado exitosamente. " +
-                                        "✉️ Se ha enviado un correo de bienvenida a " + correo);
-                        System.out.println("✓ Correo de bienvenida enviado a: " + correo);
+                                "✅ Usuario '" + nombre + "' (" + rol + ") creado exitosamente. " +
+                                        "📧 Se ha enviado un correo de bienvenida a " + correo);
+                        System.out.println("✅ Correo de bienvenida enviado a: " + correo);
                     } else {
                         request.setAttribute("success",
-                                "Usuario '" + nombre + "' creado exitosamente. " +
+                                "✅ Usuario '" + nombre + "' creado exitosamente. " +
                                         "⚠️ No se pudo enviar el correo de bienvenida.");
-                        System.out.println("✗ Error al enviar correo de bienvenida a: " + correo);
+                        System.out.println("❌ Error al enviar correo de bienvenida a: " + correo);
                     }
                 } catch (Exception emailEx) {
-                    // Si falla el correo, no afecta la creación del usuario
-                    System.err.println("✗ Error al enviar correo de bienvenida: " + emailEx.getMessage());
+                    System.err.println("❌ Error al enviar correo de bienvenida: " + emailEx.getMessage());
                     request.setAttribute("success",
-                            "Usuario '" + nombre + "' creado exitosamente. " +
+                            "✅ Usuario '" + nombre + "' creado exitosamente. " +
                                     "⚠️ No se pudo enviar el correo de bienvenida (verifica la configuración de email).");
                 }
-                // ========================================================================
 
-                System.out.println("✓ Usuario creado: " + correo);
+                System.out.println("✅ Usuario creado por Admin: " + correo + " (Rol: " + rol + ")");
             } else {
                 request.setAttribute("error", "Error al crear el usuario");
-                System.out.println("✗ Error al crear usuario: " + correo);
+                System.out.println("❌ Error al crear usuario: " + correo);
             }
 
         } catch (Exception e) {
@@ -270,10 +294,10 @@ public class UsuarioServlet extends HttpServlet {
 
             if (actualizado) {
                 request.setAttribute("success", "Usuario '" + nombre + "' actualizado exitosamente");
-                System.out.println("✓ Usuario actualizado: ID " + userId);
+                System.out.println("✅ Usuario actualizado: ID " + userId);
             } else {
                 request.setAttribute("error", "Error al actualizar el usuario");
-                System.out.println("✗ Error al actualizar usuario: ID " + userId);
+                System.out.println("❌ Error al actualizar usuario: ID " + userId);
             }
 
         } catch (NumberFormatException e) {
@@ -321,10 +345,10 @@ public class UsuarioServlet extends HttpServlet {
             if (cambiado) {
                 String accion = nuevoEstado ? "activado" : "desactivado";
                 request.setAttribute("success", "Usuario '" + usuario.getNombre() + "' " + accion + " exitosamente");
-                System.out.println("✓ Usuario " + accion + ": ID " + userId);
+                System.out.println("✅ Usuario " + accion + ": ID " + userId);
             } else {
                 request.setAttribute("error", "Error al cambiar el estado del usuario");
-                System.out.println("✗ Error al cambiar estado: ID " + userId);
+                System.out.println("❌ Error al cambiar estado: ID " + userId);
             }
 
         } catch (NumberFormatException e) {
@@ -372,10 +396,10 @@ public class UsuarioServlet extends HttpServlet {
 
             if (cambiado) {
                 request.setAttribute("success", "Contraseña actualizada para '" + usuario.getNombre() + "'");
-                System.out.println("✓ Contraseña cambiada: ID " + userId);
+                System.out.println("✅ Contraseña cambiada: ID " + userId);
             } else {
                 request.setAttribute("error", "Error al cambiar la contraseña");
-                System.out.println("✗ Error al cambiar contraseña: ID " + userId);
+                System.out.println("❌ Error al cambiar contraseña: ID " + userId);
             }
 
         } catch (NumberFormatException e) {

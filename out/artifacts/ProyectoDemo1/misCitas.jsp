@@ -4,7 +4,7 @@
 
 <%
     // ========================================================================
-    // BLOQUE DE SEGURIDAD - SOLO VETERINARIOS
+    // BLOQUE DE SEGURIDAD - VETERINARIOS O CLIENTES (permitir que el cliente vea "Mis Citas")
     // ========================================================================
     if (session == null || session.getAttribute("user") == null) {
         response.sendRedirect("login.jsp");
@@ -12,13 +12,17 @@
     }
 
     String rol = (String) session.getAttribute("rol");
-    if (rol == null || !rol.equalsIgnoreCase("Veterinario")) {
+    if (rol == null || !(rol.equalsIgnoreCase("Veterinario") || rol.equalsIgnoreCase("Cliente"))) {
         response.sendRedirect("login.jsp");
         return;
     }
 
     String nombreUsuario = (String) session.getAttribute("nombre");
-    Integer vetId = (Integer) session.getAttribute("userId");
+    Integer userId = (Integer) session.getAttribute("userId");
+    Integer vetId = null;
+    if (rol.equalsIgnoreCase("Veterinario")) {
+        vetId = userId;
+    }
 
     // Obtener lista de citas
     @SuppressWarnings("unchecked")
@@ -42,7 +46,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Citas - Veterinario</title>
+    <title>Mis Citas</title>
 
     <link rel="stylesheet" type="text/css" href="estilos/veterinario_citas.css">
 
@@ -51,9 +55,14 @@
 <nav class="navbar">
     <h1>📅 Mis Citas</h1>
     <div class="user-info">
-        <span>Dr./Dra. <strong><%= nombreUsuario %></strong></span>
-        <span class="vet-badge">⚕️ VETERINARIO</span>
-        <a href="PJVeterinario.jsp" class="btn-volver">← Volver al Panel</a>
+        <span><strong><%= nombreUsuario %></strong></span>
+        <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
+            <span class="vet-badge">⚕️ VETERINARIO</span>
+            <a href="PIVeterinario.jsp" class="btn-volver">← Volver al Panel</a>
+        <% } else { %>
+            <span class="client-badge">👤 CLIENTE</span>
+            <a href="paginaInicio.jsp" class="btn-volver">← Volver al Panel</a>
+        <% } %>
     </div>
 </nav>
 
@@ -64,9 +73,11 @@
                 <h2>📋 Gestión de Citas Veterinarias</h2>
                 <p style="color: #666; margin-top: 0.5rem;">Administra tus citas, actualiza estados y añade observaciones</p>
             </div>
+            <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
             <a href="CitaServlet?action=formCrear" class="btn-nueva-cita">
                 ➕ Nueva Cita
             </a>
+            <% } %>
         </div>
     </div>
 
@@ -158,6 +169,7 @@
                 <td><%= c.getNombreSucursal() %></td>
                 <td><%= c.getEstadoBadge() %></td>
                 <td>
+                    <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
                     <div class="action-buttons">
                         <% if (!"Completada".equals(c.getEstado()) && !"Cancelada".equals(c.getEstado())) { %>
                         <button class="btn-action btn-proceso"
@@ -184,6 +196,7 @@
                         </button>
                         <% } %>
                     </div>
+                    <% } %>
                 </td>
             </tr>
             <% } %>
@@ -223,6 +236,7 @@
             <div class="cita-info">
                 <strong>🏥 Sucursal:</strong> <%= c.getNombreSucursal() %>
             </div>
+            <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
             <div class="action-buttons">
                 <% if (!"Completada".equals(c.getEstado()) && !"Cancelada".equals(c.getEstado())) { %>
                 <button class="btn-action btn-proceso"
@@ -249,6 +263,7 @@
                 </button>
                 <% } %>
             </div>
+            <% } %>
         </div>
         <% } %>
         <% } %>

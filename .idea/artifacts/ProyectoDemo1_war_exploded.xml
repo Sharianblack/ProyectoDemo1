@@ -7,6 +7,7 @@
           <element id="module-output" name="ProyectoDemo1" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.mindrot:jbcrypt:0.4" />
           <element id="library" level="project" name="Maven: com.sun.mail:jakarta.mail:2.0.1" />
           <element id="library" level="project" name="Maven: com.sun.activation:jakarta.activation:2.0.1" />
           <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.0.33" />

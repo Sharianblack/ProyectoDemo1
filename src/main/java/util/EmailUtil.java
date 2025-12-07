@@ -186,49 +186,21 @@ public class EmailUtil {
 
         return enviarCorreo(destinatario, asunto, mensaje);
     }
-
-    // ========================================================================
-    // MÉTODO PARA ENVIAR CORREO DE BIENVENIDA (NUEVO USUARIO CREADO)
-    // ========================================================================
+// ========================================================================
+// MÉTODO PARA ENVIAR CORREO DE BIENVENIDA (USUARIO CREADO POR VETERINARIO)
+// ========================================================================
     /**
-     * Envía un correo de bienvenida cuando un administrador crea un nuevo usuario
-     * @param destinatario Correo del nuevo usuario
-     * @param nombreUsuario Nombre del usuario
-     * @param rol Rol asignado (Admin, Cliente, Veterinario)
-     * @param passwordTemporal Contraseña temporal asignada
-     * @param urlLogin URL del login de la aplicación
+     * Envía un correo de bienvenida cuando un veterinario crea un nuevo cliente
+     * @param destinatario Correo del cliente
+     * @param nombreUsuario Nombre del cliente
+     * @param rol Rol del usuario (normalmente "Cliente")
+     * @param password Contraseña temporal (en texto plano)
+     * @param urlLogin URL de la página de login
      * @return true si se envió correctamente
      */
     public static boolean enviarCorreoBienvenida(String destinatario, String nombreUsuario,
-                                                 String rol, String passwordTemporal, String urlLogin) {
-        String asunto = "¡Bienvenido a Veterinaria Bellavista! - Cuenta Creada";
-
-        // Emoji según el rol
-        String emojiRol = "";
-        String descripcionRol = "";
-        String colorRol = "#667eea";
-
-        switch (rol.toLowerCase()) {
-            case "admin":
-                emojiRol = "⚡";
-                descripcionRol = "Administrador del Sistema";
-                colorRol = "#f5576c";
-                break;
-            case "cliente":
-                emojiRol = "👤";
-                descripcionRol = "Cliente";
-                colorRol = "#667eea";
-                break;
-            case "veterinario":
-                emojiRol = "⚕️";
-                descripcionRol = "Veterinario";
-                colorRol = "#38f9d7";
-                break;
-            default:
-                emojiRol = "✓";
-                descripcionRol = rol;
-                break;
-        }
+                                                 String rol, String password, String urlLogin) {
+        String asunto = "¡Bienvenido a Veterinaria Bellavista! 🐾";
 
         String mensaje = "<!DOCTYPE html>" +
                 "<html>" +
@@ -237,79 +209,171 @@ public class EmailUtil {
                 "    <style>" +
                 "        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }" +
                 "        .container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
-                "        .header { background: linear-gradient(135deg, " + colorRol + " 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }" +
+                "        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }" +
                 "        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }" +
-                "        .credentials-box { background: white; border-left: 4px solid " + colorRol + "; padding: 20px; margin: 20px 0; border-radius: 5px; }" +
-                "        .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, " + colorRol + " 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }" +
+                "        .credenciales { background: white; padding: 20px; border-radius: 5px; border-left: 4px solid #667eea; margin: 20px 0; }" +
+                "        .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }" +
                 "        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }" +
                 "        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }" +
-                "        .badge { display: inline-block; background: " + colorRol + "; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; }" +
                 "    </style>" +
                 "</head>" +
                 "<body>" +
                 "    <div class='container'>" +
                 "        <div class='header'>" +
                 "            <h1>🐾 Veterinaria Bellavista</h1>" +
-                "            <p>¡Bienvenido al equipo!</p>" +
+                "            <p>¡Tu cuenta ha sido creada!</p>" +
                 "        </div>" +
                 "        <div class='content'>" +
-                "            <h2>¡Felicidades, " + nombreUsuario + "!</h2>" +
-                "            <p>Un administrador ha creado una cuenta para ti en nuestro sistema.</p>" +
-                "            <p>Tu rol asignado es: <span class='badge'>" + emojiRol + " " + descripcionRol + "</span></p>" +
-                "            " +
-                "            <div class='credentials-box'>" +
-                "                <h3 style='color: " + colorRol + "; margin-top: 0;'>📧 Tus Credenciales de Acceso</h3>" +
-                "                <p><strong>Usuario (Correo):</strong> " + destinatario + "</p>" +
-                "                <p><strong>Contraseña Temporal:</strong> <code style='background: #f0f0f0; padding: 5px 10px; border-radius: 3px;'>" + passwordTemporal + "</code></p>" +
+                "            <h2>¡Bienvenido, " + nombreUsuario + "!</h2>" +
+                "            <p>Tu cuenta de <strong>" + rol + "</strong> ha sido creada exitosamente en nuestro sistema.</p>" +
+                "            <p>A continuación encontrarás tus credenciales de acceso:</p>" +
+                "            <div class='credenciales'>" +
+                "                <p><strong>📧 Correo:</strong> " + destinatario + "</p>" +
+                "                <p><strong>🔑 Contraseña:</strong> " + password + "</p>" +
                 "            </div>" +
-                "            " +
-                "            <center>" +
-                "                <a href='" + urlLogin + "' class='button'>🔐 Iniciar Sesión Ahora</a>" +
-                "            </center>" +
-                "            " +
                 "            <div class='warning'>" +
-                "                <strong>⚠️ Importante - Seguridad de tu cuenta:</strong>" +
+                "                <strong>⚠️ Importante:</strong>" +
                 "                <ul style='margin: 10px 0;'>" +
-                "                    <li>Esta es una contraseña temporal</li>" +
-                "                    <li>Te recomendamos cambiarla después de iniciar sesión</li>" +
-                "                    <li>No compartas tus credenciales con nadie</li>" +
-                "                    <li>Si no solicitaste esta cuenta, contacta al administrador</li>" +
+                "                    <li>Te recomendamos <strong>cambiar tu contraseña</strong> después del primer inicio de sesión</li>" +
+                "                    <li>Guarda estas credenciales en un lugar seguro</li>" +
+                "                    <li>No compartas tu contraseña con nadie</li>" +
                 "                </ul>" +
                 "            </div>" +
-                "            " +
-                "            <h3 style='color: " + colorRol + ";'>¿Qué puedes hacer con tu cuenta?</h3>";
-
-        // Agregar características según el rol
-        if (rol.equalsIgnoreCase("Admin")) {
-            mensaje += "            <ul>" +
-                    "                <li>✓ Gestionar usuarios del sistema</li>" +
-                    "                <li>✓ Administrar sucursales y servicios</li>" +
-                    "                <li>✓ Ver reportes y estadísticas</li>" +
-                    "                <li>✓ Configurar el sistema</li>" +
-                    "            </ul>";
-        } else if (rol.equalsIgnoreCase("Cliente")) {
-            mensaje += "            <ul>" +
-                    "                <li>✓ Registrar tus mascotas</li>" +
-                    "                <li>✓ Agendar citas veterinarias</li>" +
-                    "                <li>✓ Ver el historial clínico de tus mascotas</li>" +
-                    "                <li>✓ Consultar calendario de vacunación</li>" +
-                    "            </ul>";
-        } else if (rol.equalsIgnoreCase("Veterinario")) {
-            mensaje += "            <ul>" +
-                    "                <li>✓ Gestionar tus citas asignadas</li>" +
-                    "                <li>✓ Registrar diagnósticos y tratamientos</li>" +
-                    "                <li>✓ Actualizar historiales clínicos</li>" +
-                    "                <li>✓ Registrar vacunaciones</li>" +
-                    "            </ul>";
-        }
-
-        mensaje += "            <p style='margin-top: 30px;'>Si tienes alguna duda, no dudes en contactarnos.</p>" +
-                "            <p>¡Bienvenido a bordo!</p>" +
+                "            <center>" +
+                "                <a href='" + urlLogin + "' class='button'>🔐 Iniciar Sesión</a>" +
+                "            </center>" +
+                "            <p style='margin-top: 30px;'><strong>Ahora puedes:</strong></p>" +
+                "            <ul>" +
+                "                <li>✅ Registrar tus mascotas</li>" +
+                "                <li>✅ Agendar citas veterinarias</li>" +
+                "                <li>✅ Consultar historial clínico</li>" +
+                "                <li>✅ Ver calendario de vacunación</li>" +
+                "            </ul>" +
                 "            <p style='margin-top: 30px;'>Saludos,<br><strong>Equipo de Veterinaria Bellavista</strong></p>" +
                 "        </div>" +
                 "        <div class='footer'>" +
                 "            <p>Este es un correo automático, por favor no responder.</p>" +
                 "            <p>&copy; 2025 Veterinaria Bellavista - Todos los derechos reservados</p>" +
+                "        </div>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+
+        return enviarCorreo(destinatario, asunto, mensaje);
+    }
+    // ========================================================================
+    // MÉTODO PARA ENVIAR CORREO DE BIENVENIDA (NUEVO USUARIO CREADO)
+    // ========================================================================
+    /**
+            * Envía un correo con el enlace de verificación de email
+     * @param destinatario Correo del usuario
+     * @param nombreUsuario Nombre del usuario
+     * @param token Token de verificación generado
+     * @param urlBase URL base de tu aplicación
+     * @return true si se envió correctamente
+     */
+    public static boolean enviarCorreoVerificacion(String destinatario, String nombreUsuario,
+                                                   String token, String urlBase) {
+        String asunto = "Verifica tu correo - Veterinaria Bellavista";
+
+        // Crear el enlace de verificación
+        String enlaceVerificacion = urlBase + "/verificarEmail.jsp?token=" + token;
+
+        // Crear mensaje HTML
+        String mensaje = crearMensajeVerificacionHTML(nombreUsuario, enlaceVerificacion);
+
+        return enviarCorreo(destinatario, asunto, mensaje);
+    }
+
+    /**
+     * Plantilla HTML para correo de verificación
+     */
+    private static String crearMensajeVerificacionHTML(String nombreUsuario, String enlaceVerificacion) {
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "    <meta charset='UTF-8'>" +
+                "    <style>" +
+                "        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }" +
+                "        .container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
+                "        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }" +
+                "        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }" +
+                "        .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }" +
+                "        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }" +
+                "        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }" +
+                "        .icon { font-size: 48px; margin: 20px 0; }" +
+                "    </style>" +
+                "</head>" +
+                "<body>" +
+                "    <div class='container'>" +
+                "        <div class='header'>" +
+                "            <div class='icon'>📧</div>" +
+                "            <h1>🐾 Veterinaria Bellavista</h1>" +
+                "            <p>Verifica tu correo electrónico</p>" +
+                "        </div>" +
+                "        <div class='content'>" +
+                "            <h2>¡Hola, " + nombreUsuario + "!</h2>" +
+                "            <p>Gracias por registrarte en <strong>Veterinaria Bellavista</strong>.</p>" +
+                "            <p>Para completar tu registro y activar tu cuenta, necesitamos verificar que este correo electrónico te pertenece.</p>" +
+                "            <p><strong>Haz clic en el siguiente botón para verificar tu correo:</strong></p>" +
+                "            <center>" +
+                "                <a href='" + enlaceVerificacion + "' class='button'>✅ Verificar mi Correo</a>" +
+                "            </center>" +
+                "            <p>O copia y pega este enlace en tu navegador:</p>" +
+                "            <p style='word-break: break-all; background: white; padding: 10px; border-radius: 5px;'>" +
+                "                <a href='" + enlaceVerificacion + "'>" + enlaceVerificacion + "</a>" +
+                "            </p>" +
+                "            <div class='warning'>" +
+                "                <strong>⚠️ Importante:</strong>" +
+                "                <ul style='margin: 10px 0;'>" +
+                "                    <li>Este enlace expirará en <strong>24 horas</strong></li>" +
+                "                    <li>Solo puede usarse <strong>una vez</strong></li>" +
+                "                    <li>Si no te registraste, ignora este correo</li>" +
+                "                    <li>Tu cuenta NO se creará hasta que verifiques tu email</li>" +
+                "                </ul>" +
+                "            </div>" +
+                "            <p style='margin-top: 30px;'>Una vez verificado, podrás iniciar sesión y disfrutar de todos nuestros servicios.</p>" +
+                "            <p><strong>¡Bienvenido a nuestra familia!</strong> 🐶🐱</p>" +
+                "        </div>" +
+                "        <div class='footer'>" +
+                "            <p>Este es un correo automático, por favor no responder.</p>" +
+                "            <p>&copy; 2025 Veterinaria Bellavista - Todos los derechos reservados</p>" +
+                "        </div>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    /**
+     * Envía correo de confirmación después de verificar el email
+     */
+    public static boolean enviarCorreoEmailVerificado(String destinatario, String nombreUsuario, String urlLogin) {
+        String asunto = "✅ Email Verificado - Cuenta Activada";
+
+        String mensaje = "<!DOCTYPE html>" +
+                "<html>" +
+                "<head><meta charset='UTF-8'></head>" +
+                "<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>" +
+                "    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>" +
+                "        <div style='background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 30px; text-align: center; border-radius: 10px;'>" +
+                "            <h1 style='font-size: 48px; margin: 0;'>✅</h1>" +
+                "            <h2>¡Email Verificado!</h2>" +
+                "            <p>Tu cuenta ha sido activada exitosamente</p>" +
+                "        </div>" +
+                "        <div style='background: #f9f9f9; padding: 30px; margin-top: 20px; border-radius: 10px;'>" +
+                "            <h2>¡Felicidades, " + nombreUsuario + "!</h2>" +
+                "            <p>Tu correo electrónico ha sido verificado correctamente y tu cuenta está ahora <strong>activa</strong>.</p>" +
+                "            <p>Ya puedes iniciar sesión y comenzar a usar todos nuestros servicios:</p>" +
+                "            <ul>" +
+                "                <li>✅ Registrar tus mascotas</li>" +
+                "                <li>✅ Agendar citas veterinarias</li>" +
+                "                <li>✅ Ver historial clínico</li>" +
+                "                <li>✅ Consultar calendario de vacunación</li>" +
+                "            </ul>" +
+                "            <center style='margin: 30px 0;'>" +
+                "                <a href='" + urlLogin + "' style='display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'>🔐 Iniciar Sesión</a>" +
+                "            </center>" +
+                "            <p style='margin-top: 30px;'>Saludos,<br><strong>Equipo de Veterinaria Bellavista</strong> 🐾</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +

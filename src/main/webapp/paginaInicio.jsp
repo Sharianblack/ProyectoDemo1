@@ -85,12 +85,14 @@
     </div>
 
     <div class="features-grid">
-        <div class="feature-card">
-            <h3>📅 Mis Citas</h3>
-            <p>Agenda y gestiona las citas veterinarias de tus mascotas</p>
-        </div>
 
-        <div class="feature-card" onclick="location.href='MascotaServlet?action=listar'" style="cursor: pointer;">
+        <a href="<%=request.getContextPath()%>/CitaServlet?action=misCitas" style="text-decoration: none; color: inherit;">
+            <div class="feature-card" style="cursor: pointer;">
+                <h3>📅 Mis Citas</h3>
+                <p>Agenda y gestiona las citas veterinarias de tus mascotas</p>
+            </div>
+        </a>
+        <div class="feature-card" onclick="location.href='<%=request.getContextPath()%>/MascotaServlet?action=listar'" style="cursor: pointer;">
             <h3>🐕 Mis Mascotas</h3>
             <p>Administra la información de tus mascotas registradas</p>
         </div>

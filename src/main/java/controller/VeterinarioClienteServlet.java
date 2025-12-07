@@ -2,6 +2,7 @@ package controller;
 
 import model.Usuario;
 import dao.UsuarioDao;
+import dao.EmailVerificationTokenDao;
 import util.EmailUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class VeterinarioClienteServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UsuarioDao usuarioDao;
+    private EmailVerificationTokenDao tokenDao;
 
     @Override
     public void init() {
         usuarioDao = new UsuarioDao();
+        tokenDao = new EmailVerificationTokenDao();
     }
 
     // ========================================================================
@@ -158,6 +161,24 @@ public class VeterinarioClienteServlet extends HttpServlet {
                 return;
             }
 
+            // 🔥 VALIDAR FORMATO DE EMAIL
+            String mensajeValidacion = util.EmailValidator.validarConMensaje(correo);
+            if (mensajeValidacion != null) {
+                request.setAttribute("error", "❌ Correo inválido: " + mensajeValidacion);
+                listarClientes(request, response);
+                return;
+            }
+
+            // 🔥 RECHAZAR EMAILS TEMPORALES
+            if (util.EmailValidator.esEmailTemporal(correo)) {
+                request.setAttribute("error", "❌ No se permiten correos temporales o desechables");
+                listarClientes(request, response);
+                return;
+            }
+
+            // Normalizar el correo
+            correo = util.EmailValidator.normalizar(correo);
+
             // Verificar si el correo ya existe
             if (usuarioDao.correoExiste(correo)) {
                 request.setAttribute("error", "El correo '" + correo + "' ya está registrado");
@@ -165,12 +186,21 @@ public class VeterinarioClienteServlet extends HttpServlet {
                 return;
             }
 
+            // 🔥 NUEVA VALIDACIÓN: Verificar si tiene token pendiente
+            if (tokenDao.tienTokenPendiente(correo)) {
+                request.setAttribute("warning",
+                        "⚠️ Este correo tiene una verificación pendiente del registro público. " +
+                                "El usuario debe completar esa verificación primero o esperar 24 horas.");
+                listarClientes(request, response);
+                return;
+            }
+
             // Crear cliente (ROL FIJO: Cliente)
             Usuario nuevoCliente = new Usuario();
             nuevoCliente.setNombre(nombre.trim());
-            nuevoCliente.setCorreo(correo.trim().toLowerCase());
+            nuevoCliente.setCorreo(correo);
             nuevoCliente.setPasswordHash(password);
-            nuevoCliente.setRol("Cliente"); // 🔒 ROL FIJO - Solo puede crear clientes
+            nuevoCliente.setRol("Cliente");
             nuevoCliente.setTelefono(telefono != null ? telefono.trim() : "");
             nuevoCliente.setDireccion(direccion != null ? direccion.trim() : "");
             nuevoCliente.setActivo(true);
@@ -185,8 +215,8 @@ public class VeterinarioClienteServlet extends HttpServlet {
                             request.getServerPort() +
                             request.getContextPath() + "/login.jsp";
 
-                    boolean correoEnviado = EmailUtil.enviarCorreoBienvenida(
-                            correo.trim().toLowerCase(),
+                    boolean correoEnviado = util.EmailUtil.enviarCorreoBienvenida(
+                            correo,
                             nombre.trim(),
                             "Cliente",
                             password,
@@ -270,7 +300,7 @@ public class VeterinarioClienteServlet extends HttpServlet {
             cliente.setId(userId);
             cliente.setNombre(nombre.trim());
             cliente.setCorreo(correo.trim().toLowerCase());
-            cliente.setRol("Cliente"); // 🔒 Mantener rol Cliente
+            cliente.setRol("Cliente");
             cliente.setTelefono(telefono != null ? telefono.trim() : "");
             cliente.setDireccion(direccion != null ? direccion.trim() : "");
             cliente.setActivo(activo);

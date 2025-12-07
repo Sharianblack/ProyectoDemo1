@@ -31,15 +31,19 @@ public class CitaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verificar que sea Veterinario
-        if (!esVeterinario(request, response)) {
+        // Obtener acción y permitir acceso público para la acción 'misCitas' (clientes)
+        String action = request.getParameter("action");
+        if (action == null) action = "listar";
+
+        // Si la acción solicitada es ver las citas del cliente, no forzamos el check de veterinario
+        if ("misCitas".equals(action)) {
+            listarCitasCliente(request, response);
             return;
         }
 
-        String action = request.getParameter("action");
-
-        if (action == null) {
-            action = "listar";
+        // Verificar que sea Veterinario para el resto de acciones
+        if (!esVeterinario(request, response)) {
+            return;
         }
 
         switch (action) {
@@ -132,6 +136,32 @@ public class CitaServlet extends HttpServlet {
         request.setAttribute("enProceso", enProceso);
         request.setAttribute("completadas", completadas);
         request.setAttribute("canceladas", canceladas);
+
+        request.getRequestDispatcher("misCitas.jsp").forward(request, response);
+    }
+
+    // ========================================================================
+    // LISTAR CITAS DEL CLIENTE (MIS CITAS)
+    // ========================================================================
+    private void listarCitasCliente(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        List<Cita> citas = citaDao.obtenerCitasCliente(userId);
+
+        request.setAttribute("citas", citas);
+        request.setAttribute("totalCitas", citas.size());
 
         request.getRequestDispatcher("misCitas.jsp").forward(request, response);
     }
