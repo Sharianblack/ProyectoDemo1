@@ -90,7 +90,7 @@
             <p>Agenda y gestiona las citas veterinarias de tus mascotas</p>
         </div>
 
-        <div class="feature-card">
+        <div class="feature-card" onclick="location.href='MascotaServlet?action=listar'" style="cursor: pointer;">
             <h3>🐕 Mis Mascotas</h3>
             <p>Administra la información de tus mascotas registradas</p>
         </div>

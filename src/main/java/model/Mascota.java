@@ -4,23 +4,22 @@ import java.sql.Date;
 
 public class Mascota {
     private int idMascota;
-    private int idCliente;
+    private int idUsuarioPropietario; // 🔥 CAMBIO: Ahora apunta directo a usuarios
     private String nombre;
     private String especie;
     private String raza;
     private String sexo;
     private Date fechaNacimiento;
 
-    // Campo auxiliar
-    private String nombreCliente;
+    // Campos auxiliares
+    private String nombrePropietario;
+    private String correoPropietario;
+    private int edad; // Calculada
 
-    // ========================================================================
-    // CONSTRUCTORES
-    // ========================================================================
     public Mascota() {}
 
-    public Mascota(int idCliente, String nombre, String especie, String raza, String sexo, Date fechaNacimiento) {
-        this.idCliente = idCliente;
+    public Mascota(int idUsuarioPropietario, String nombre, String especie, String raza, String sexo, Date fechaNacimiento) {
+        this.idUsuarioPropietario = idUsuarioPropietario;
         this.nombre = nombre;
         this.especie = especie;
         this.raza = raza;
@@ -28,9 +27,7 @@ public class Mascota {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    // ========================================================================
     // GETTERS Y SETTERS
-    // ========================================================================
     public int getIdMascota() {
         return idMascota;
     }
@@ -39,12 +36,12 @@ public class Mascota {
         this.idMascota = idMascota;
     }
 
-    public int getIdCliente() {
-        return idCliente;
+    public int getIdUsuarioPropietario() {
+        return idUsuarioPropietario;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
+    public void setIdUsuarioPropietario(int idUsuarioPropietario) {
+        this.idUsuarioPropietario = idUsuarioPropietario;
     }
 
     public String getNombre() {
@@ -87,12 +84,45 @@ public class Mascota {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public String getNombreCliente() {
-        return nombreCliente;
+    public String getNombrePropietario() {
+        return nombrePropietario;
     }
 
-    public void setNombreCliente(String nombreCliente) {
-        this.nombreCliente = nombreCliente;
+    public void setNombrePropietario(String nombrePropietario) {
+        this.nombrePropietario = nombrePropietario;
+    }
+
+    public String getCorreoPropietario() {
+        return correoPropietario;
+    }
+
+    public void setCorreoPropietario(String correoPropietario) {
+        this.correoPropietario = correoPropietario;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    // MÃTODOS AUXILIARES
+    public String getSexoCompleto() {
+        if (sexo == null) return "No especificado";
+        return sexo.equalsIgnoreCase("M") ? "Macho" : "Hembra";
+    }
+
+    public String getIconoEspecie() {
+        if (especie == null) return "🐾";
+        String especieLower = especie.toLowerCase();
+        if (especieLower.contains("perro")) return "🐕";
+        if (especieLower.contains("gato")) return "🐈";
+        if (especieLower.contains("ave") || especieLower.contains("pájaro")) return "🐦";
+        if (especieLower.contains("conejo")) return "🐰";
+        if (especieLower.contains("hamster")) return "🐹";
+        return "🐾";
     }
 
     @Override
@@ -101,7 +131,7 @@ public class Mascota {
                 "idMascota=" + idMascota +
                 ", nombre='" + nombre + '\'' +
                 ", especie='" + especie + '\'' +
-                ", raza='" + raza + '\'' +
+                ", propietario='" + nombrePropietario + '\'' +
                 '}';
     }
 }
