@@ -70,40 +70,16 @@
             <p>Registrar y gestionar clientes</p>
         </div>
 
-        <div class="vet-card">
+        <div class="vet-card" onclick="location.href='PacienteServlet?action=listar'" style="cursor: pointer;">
             <div class="icon">🐕</div>
             <h3>Pacientes</h3>
             <p>Consultar información de mascotas</p>
         </div>
 
-        <div class="vet-card">
+        <div class="vet-card" onclick="location.href='HistorialClinicoServlet?action=listar'" style="cursor: pointer;">
             <div class="icon">📋</div>
             <h3>Historial Clínico</h3>
             <p>Registrar diagnósticos y tratamientos</p>
-        </div>
-
-        <div class="vet-card">
-            <div class="icon">💉</div>
-            <h3>Vacunación</h3>
-            <p>Registrar aplicación de vacunas</p>
-        </div>
-
-        <div class="vet-card">
-            <div class="icon">📝</div>
-            <h3>Recetas</h3>
-            <p>Generar recetas médicas</p>
-        </div>
-
-        <div class="vet-card">
-            <div class="icon">🕐</div>
-            <h3>Mi Horario</h3>
-            <p>Consultar disponibilidad y horarios</p>
-        </div>
-
-        <div class="vet-card">
-            <div class="icon">📊</div>
-            <h3>Mis Estadísticas</h3>
-            <p>Ver métricas de atención</p>
         </div>
 
         <div class="vet-card">

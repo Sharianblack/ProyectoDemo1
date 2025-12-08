@@ -3,6 +3,7 @@ package controller;
 import model.Usuario;
 import dao.UsuarioDao;
 import dao.EmailVerificationTokenDao;
+import util.ValidacionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -100,7 +101,16 @@ public class UsuarioServlet extends HttpServlet {
     private void listarUsuarios(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Usuario> usuarios = usuarioDao.listarTodos();
+        String criterio = request.getParameter("criterio");
+        List<Usuario> usuarios;
+
+        if (criterio != null && !criterio.trim().isEmpty()) {
+            usuarios = usuarioDao.buscarUsuarios(criterio.trim());
+            request.setAttribute("criterio", criterio);
+        } else {
+            usuarios = usuarioDao.listarTodos();
+        }
+
         request.setAttribute("usuarios", usuarios);
         request.getRequestDispatcher("gestionUsuarios.jsp").forward(request, response);
     }
@@ -140,13 +150,54 @@ public class UsuarioServlet extends HttpServlet {
             String telefono = request.getParameter("telefono");
             String direccion = request.getParameter("direccion");
 
-            // Validaciones básicas
-            if (nombre == null || nombre.trim().isEmpty() ||
-                    correo == null || correo.trim().isEmpty() ||
-                    password == null || password.trim().isEmpty() ||
-                    rol == null || rol.trim().isEmpty()) {
+            // Guardar datos para mantenerlos en caso de error
+            request.setAttribute("formNombre", nombre);
+            request.setAttribute("formCorreo", correo);
+            request.setAttribute("formRol", rol);
+            request.setAttribute("formTelefono", telefono);
+            request.setAttribute("formDireccion", direccion);
+            request.setAttribute("mostrarModal", "crear");
 
-                request.setAttribute("error", "Todos los campos obligatorios deben estar completos");
+            // Validar campos obligatorios
+            if (!ValidacionUtil.noEstaVacio(nombre)) {
+                request.setAttribute("error", "El nombre es requerido");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esNombreValido(nombre)) {
+                request.setAttribute("error", "El nombre solo debe contener letras y espacios");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esTextoValido(nombre, 3, 100)) {
+                request.setAttribute("error", "El nombre debe tener entre 3 y 100 caracteres");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esEmailValido(correo)) {
+                request.setAttribute("error", "El correo electrónico no es válido");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esPasswordValido(password)) {
+                request.setAttribute("error", "La contraseña debe tener al menos 6 caracteres");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esRolValido(rol)) {
+                request.setAttribute("error", "Rol inválido. Debe ser: Admin, Veterinario o Cliente");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validar teléfono si se proporciona
+            if (ValidacionUtil.noEstaVacio(telefono) && !ValidacionUtil.esTelefonoValido(telefono)) {
+                request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
                 listarUsuarios(request, response);
                 return;
             }
@@ -154,14 +205,14 @@ public class UsuarioServlet extends HttpServlet {
             // 🔥 VALIDAR FORMATO DE EMAIL
             String mensajeValidacion = util.EmailValidator.validarConMensaje(correo);
             if (mensajeValidacion != null) {
-                request.setAttribute("error", "❌ Correo inválido: " + mensajeValidacion);
+                request.setAttribute("error", "Correo inválido: " + mensajeValidacion);
                 listarUsuarios(request, response);
                 return;
             }
 
             // 🔥 RECHAZAR EMAILS TEMPORALES
             if (util.EmailValidator.esEmailTemporal(correo)) {
-                request.setAttribute("error", "❌ No se permiten correos temporales o desechables");
+                request.setAttribute("error", "No se permiten correos temporales o desechables");
                 listarUsuarios(request, response);
                 return;
             }
@@ -178,26 +229,38 @@ public class UsuarioServlet extends HttpServlet {
 
             // 🔥 NUEVA VALIDACIÓN: Verificar si tiene token pendiente
             if (tokenDao.tienTokenPendiente(correo)) {
-                request.setAttribute("warning",
-                        "⚠️ Este correo tiene una verificación pendiente del registro público. " +
+                request.setAttribute("error",
+                        "Este correo tiene una verificación pendiente del registro público. " +
                                 "El usuario debe completar esa verificación primero o esperar 24 horas.");
                 listarUsuarios(request, response);
                 return;
             }
 
+            // Sanitizar datos
+            String nombreSanitizado = ValidacionUtil.sanitizar(nombre.trim());
+            String direccionSanitizada = ValidacionUtil.sanitizar(direccion != null ? direccion.trim() : "");
+
             // Crear usuario
             Usuario nuevoUsuario = new Usuario();
-            nuevoUsuario.setNombre(nombre.trim());
+            nuevoUsuario.setNombre(nombreSanitizado);
             nuevoUsuario.setCorreo(correo);
             nuevoUsuario.setPasswordHash(password);
             nuevoUsuario.setRol(rol);
             nuevoUsuario.setTelefono(telefono != null ? telefono.trim() : "");
-            nuevoUsuario.setDireccion(direccion != null ? direccion.trim() : "");
+            nuevoUsuario.setDireccion(direccionSanitizada);
             nuevoUsuario.setActivo(true);
 
             boolean creado = usuarioDao.crearUsuario(nuevoUsuario);
 
             if (creado) {
+                // Limpiar atributos del formulario
+                request.removeAttribute("formNombre");
+                request.removeAttribute("formCorreo");
+                request.removeAttribute("formRol");
+                request.removeAttribute("formTelefono");
+                request.removeAttribute("formDireccion");
+                request.removeAttribute("mostrarModal");
+
                 // Enviar correo de bienvenida
                 try {
                     String urlLogin = request.getScheme() + "://" +
@@ -263,12 +326,52 @@ public class UsuarioServlet extends HttpServlet {
             String direccion = request.getParameter("direccion");
             boolean activo = request.getParameter("activo") != null;
 
+            // Preservar datos del formulario para el caso de error
+            request.setAttribute("formUserId", userId);
+            request.setAttribute("formNombre", nombre);
+            request.setAttribute("formCorreo", correo);
+            request.setAttribute("formRol", rol);
+            request.setAttribute("formTelefono", telefono);
+            request.setAttribute("formDireccion", direccion);
+            request.setAttribute("formActivo", activo);
+            request.setAttribute("mostrarModal", "editar");
+
             // Validaciones básicas
             if (nombre == null || nombre.trim().isEmpty() ||
                     correo == null || correo.trim().isEmpty() ||
                     rol == null || rol.trim().isEmpty()) {
 
                 request.setAttribute("error", "Todos los campos obligatorios deben estar completos");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validación de nombre (solo letras y espacios)
+            if (!util.ValidacionUtil.esNombreValido(nombre)) {
+                request.setAttribute("error", "El nombre solo debe contener letras y espacios");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validación de correo
+            if (!util.ValidacionUtil.esEmailValido(correo)) {
+                request.setAttribute("error", "El formato del correo electrónico no es válido");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validación de teléfono (si se proporciona)
+            if (telefono != null && !telefono.trim().isEmpty()) {
+                if (!util.ValidacionUtil.esTelefonoValido(telefono)) {
+                    request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
+                    listarUsuarios(request, response);
+                    return;
+                }
+            }
+
+            // Validación de rol
+            if (!util.ValidacionUtil.esRolValido(rol)) {
+                request.setAttribute("error", "El rol seleccionado no es válido");
                 listarUsuarios(request, response);
                 return;
             }
@@ -293,6 +396,16 @@ public class UsuarioServlet extends HttpServlet {
             boolean actualizado = usuarioDao.actualizarUsuario(usuario);
 
             if (actualizado) {
+                // Limpiar atributos del formulario en caso de éxito
+                request.removeAttribute("formUserId");
+                request.removeAttribute("formNombre");
+                request.removeAttribute("formCorreo");
+                request.removeAttribute("formRol");
+                request.removeAttribute("formTelefono");
+                request.removeAttribute("formDireccion");
+                request.removeAttribute("formActivo");
+                request.removeAttribute("mostrarModal");
+
                 request.setAttribute("success", "Usuario '" + nombre + "' actualizado exitosamente");
                 System.out.println("✅ Usuario actualizado: ID " + userId);
             } else {

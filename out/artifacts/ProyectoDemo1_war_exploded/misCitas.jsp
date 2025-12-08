@@ -173,11 +173,11 @@
                     <div class="action-buttons">
                         <% if (!"Completada".equals(c.getEstado()) && !"Cancelada".equals(c.getEstado())) { %>
                         <button class="btn-action btn-proceso"
-                                onclick="cambiarEstado(<%= c.getIdCita() %>, 'En Proceso')">
+                                onclick="cambiarEstado(<%= c.getIdCita() %>, &quot;En Proceso&quot;)">
                             ⏳ En Proceso
                         </button>
                         <button class="btn-action btn-completar"
-                                onclick="cambiarEstado(<%= c.getIdCita() %>, 'Completada')">
+                                onclick="cambiarEstado(<%= c.getIdCita() %>, &quot;Completada&quot;)">
                             ✓ Completar
                         </button>
                         <% } %>
@@ -185,13 +185,16 @@
                            class="btn-action btn-editar-yellow">
                             ✏️ Editar
                         </a>
+                        <%
+                          String obsVal = c.getObservaciones() != null ? c.getObservaciones().replace("'", "\\'").replace("\n", "\\n").replace("\r", "") : "";
+                        %>
                         <button class="btn-action btn-observar"
-                                onclick="abrirModalObservaciones(<%= c.getIdCita() %>, '<%= c.getObservaciones() != null ? c.getObservaciones().replace("'", "\\'").replace("\n", "\\n") : "" %>')">
+                                onclick="abrirModalObservaciones(<%= c.getIdCita() %>, '<%= obsVal %>')">
                             📝 Observaciones
                         </button>
                         <% if ("Programada".equals(c.getEstado())) { %>
                         <button class="btn-action btn-cancelar"
-                                onclick="eliminarCita(<%= c.getIdCita() %>)">
+                                onclick="if(confirm(&quot;¿Estás seguro de eliminar esta cita?&quot;)) window.location.href=&quot;CitaServlet?action=eliminar&amp;id=<%= c.getIdCita() %>&quot;">
                             🗑️ Eliminar
                         </button>
                         <% } %>

@@ -63,34 +63,10 @@
       <p>Crear, editar y eliminar usuarios del sistema</p>
     </div>
 
-    <div class="admin-card">
+    <div class="admin-card" onclick="location.href='SucursalServlet?action=listar'" style="cursor: pointer;">
       <div class="icon">🏥</div>
       <h3>Sucursales</h3>
       <p>Administrar sucursales y sus ubicaciones</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">💼</div>
-      <h3>Servicios</h3>
-      <p>Gestionar servicios veterinarios y precios</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">⚕️</div>
-      <h3>Veterinarios</h3>
-      <p>Administrar el personal veterinario</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">📅</div>
-      <h3>Citas</h3>
-      <p>Ver y gestionar todas las citas del sistema</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">💰</div>
-      <h3>Reportes Financieros</h3>
-      <p>Consultar ingresos y pagos</p>
     </div>
 
     <div class="admin-card">

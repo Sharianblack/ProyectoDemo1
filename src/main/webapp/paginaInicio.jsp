@@ -78,10 +78,8 @@
 <div class="content">
     <div class="welcome-card">
         <h2>¡Bienvenido al Portal de Clientes!</h2>
-        <p>Has iniciado sesión exitosamente como <strong>Cliente</strong>.</p>
-        <p>Desde aquí puedes gestionar las citas de tus mascotas, ver su historial clínico y mucho más.</p>
-        <p><strong>Tu ID de usuario:</strong> <%= userId %></p>
-        <p><strong>Correo:</strong> <%= username %></p>
+        <p>Somos la mejor clínica veterinaria de la región. Nos dedicamos al cuidado y bienestar de tu mascota con amor, profesionalismo y tecnología de punta.</p>
+        <p>Tu compañero peludo merece lo mejor, y estamos aquí para brindárselo. ¡Confía en nosotros para cuidar de quien más quieres! 🐾❤️</p>
     </div>
 
     <div class="features-grid">
@@ -95,21 +93,6 @@
         <div class="feature-card" onclick="location.href='<%=request.getContextPath()%>/MascotaServlet?action=listar'" style="cursor: pointer;">
             <h3>🐕 Mis Mascotas</h3>
             <p>Administra la información de tus mascotas registradas</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>📋 Historial Clínico</h3>
-            <p>Consulta el historial médico de tus mascotas</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>💉 Vacunas</h3>
-            <p>Revisa el calendario de vacunación</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>💳 Mis Pagos</h3>
-            <p>Consulta y realiza pagos de servicios</p>
         </div>
 
         <div class="feature-card">

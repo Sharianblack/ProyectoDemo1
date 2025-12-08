@@ -123,26 +123,31 @@
         </td>
         <td>
           <div class="action-buttons">
+            <%
+              String nombreEscapado = u.getNombre().replace("'", "\\'");
+              String telefonoVal = u.getTelefono() != null ? u.getTelefono() : "";
+              String direccionVal = u.getDireccion() != null ? u.getDireccion().replace("'", "\\'") : "";
+            %>
             <button class="btn-action btn-edit"
-                    onclick="abrirModalEditar(<%= u.getId() %>, '<%= u.getNombre().replace("'", "\\'") %>', '<%= u.getCorreo() %>', '<%= u.getRol() %>', '<%= u.getTelefono() != null ? u.getTelefono() : "" %>', '<%= u.getDireccion() != null ? u.getDireccion().replace("'", "\\'") : "" %>', <%= u.isActivo() %>)">
+                    onclick="abrirModalEditar(<%= u.getId() %>, '<%= nombreEscapado %>', '<%= u.getCorreo() %>', '<%= u.getRol() %>', '<%= telefonoVal %>', '<%= direccionVal %>', <%= u.isActivo() %>)">
               ✏️ Editar
             </button>
 
             <button class="btn-action btn-password"
-                    onclick="abrirModalPassword(<%= u.getId() %>, '<%= u.getNombre().replace("'", "\\'") %>')">
+                    onclick="abrirModalPassword(<%= u.getId() %>, '<%= nombreEscapado %>')">
               🔑 Cambiar Clave
             </button>
 
             <% if (u.isActivo()) { %>
             <% if (adminId == null || adminId != u.getId()) { %>
             <button class="btn-action btn-toggle"
-                    onclick="cambiarEstado(<%= u.getId() %>, false, '<%= u.getNombre().replace("'", "\\'") %>')">
+                    onclick="cambiarEstado(<%= u.getId() %>, false, '<%= nombreEscapado %>')">
               🔒 Desactivar
             </button>
             <% } %>
             <% } else { %>
             <button class="btn-action btn-activate"
-                    onclick="cambiarEstado(<%= u.getId() %>, true, '<%= u.getNombre().replace("'", "\\'") %>')">
+                    onclick="cambiarEstado(<%= u.getId() %>, true, '<%= nombreEscapado %>')">
               🔓 Activar
             </button>
             <% } %>
@@ -172,46 +177,61 @@
       <h3>➕ Crear Nuevo Usuario</h3>
       <span class="close" onclick="cerrarModal('modalCrear')">&times;</span>
     </div>
+    
+    <% if (request.getAttribute("error") != null && "crear".equals(request.getAttribute("mostrarModal"))) { %>
+    <div class="alert alert-error" style="margin-bottom: 1rem; padding: 0.75rem; background-color: #fee; border-left: 4px solid #dc3545; color: #721c24;">
+      <%= request.getAttribute("error") %>
+    </div>
+    <% } %>
+    
     <form action="UsuarioServlet" method="post">
       <input type="hidden" name="action" value="crear">
 
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
-        <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
+        <input type="text" name="nombre" placeholder="Ej: Juan Pérez"
+               value="<%= request.getAttribute("formNombre") != null ? request.getAttribute("formNombre") : "" %>"
+               onkeypress="return soloLetras(event)"
+               onpaste="return false">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Correo Electrónico <span class="required">*</span></label>
-          <input type="email" name="correo" required placeholder="usuario@ejemplo.com">
+          <input type="text" name="correo" placeholder="usuario@ejemplo.com"
+                 value="<%= request.getAttribute("formCorreo") != null ? request.getAttribute("formCorreo") : "" %>">
         </div>
 
         <div class="form-group">
           <label>Contraseña <span class="required">*</span></label>
-          <input type="password" name="password" required placeholder="Mínimo 4 caracteres" minlength="4">
+          <input type="password" name="password" placeholder="Mínimo 6 caracteres">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Rol <span class="required">*</span></label>
-          <select name="rol" required>
+          <select name="rol">
             <option value="">Seleccionar...</option>
-            <option value="Admin">Administrador</option>
-            <option value="Cliente">Cliente</option>
-            <option value="Veterinario">Veterinario</option>
+            <option value="Admin" <%= "Admin".equals(request.getAttribute("formRol")) ? "selected" : "" %>>Administrador</option>
+            <option value="Cliente" <%= "Cliente".equals(request.getAttribute("formRol")) ? "selected" : "" %>>Cliente</option>
+            <option value="Veterinario" <%= "Veterinario".equals(request.getAttribute("formRol")) ? "selected" : "" %>>Veterinario</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Teléfono</label>
-          <input type="tel" name="telefono" placeholder="0999999999">
+          <label>Teléfono (10 dígitos)</label>
+          <input type="text" name="telefono" placeholder="0999999999" maxlength="10"
+                 value="<%= request.getAttribute("formTelefono") != null ? request.getAttribute("formTelefono") : "" %>"
+                 onkeypress="return soloNumeros(event)"
+                 onpaste="return false">
         </div>
       </div>
 
       <div class="form-group">
         <label>Dirección</label>
-        <input type="text" name="direccion" placeholder="Ej: Av. Principal 123">
+        <input type="text" name="direccion" placeholder="Ej: Av. Principal 123"
+               value="<%= request.getAttribute("formDireccion") != null ? request.getAttribute("formDireccion") : "" %>">
       </div>
 
       <div class="form-actions">
@@ -228,24 +248,33 @@
       <h3>✏️ Editar Usuario</h3>
       <span class="close" onclick="cerrarModal('modalEditar')">&times;</span>
     </div>
+    
+    <% if (request.getAttribute("error") != null && "editar".equals(request.getAttribute("mostrarModal"))) { %>
+    <div class="alert alert-error" style="margin-bottom: 1rem; padding: 0.75rem; background-color: #fee; border-left: 4px solid #dc3545; color: #721c24;">
+      <%= request.getAttribute("error") %>
+    </div>
+    <% } %>
+    
     <form action="UsuarioServlet" method="post">
       <input type="hidden" name="action" value="actualizar">
       <input type="hidden" name="userId" id="editUserId">
 
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
-        <input type="text" name="nombre" id="editNombre" required>
+        <input type="text" name="nombre" id="editNombre"
+               onkeypress="return soloLetras(event)"
+               onpaste="return false">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Correo Electrónico <span class="required">*</span></label>
-          <input type="email" name="correo" id="editCorreo" required>
+          <input type="text" name="correo" id="editCorreo">
         </div>
 
         <div class="form-group">
           <label>Rol <span class="required">*</span></label>
-          <select name="rol" id="editRol" required>
+          <select name="rol" id="editRol">
             <option value="Admin">Administrador</option>
             <option value="Cliente">Cliente</option>
             <option value="Veterinario">Veterinario</option>
@@ -255,8 +284,10 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>Teléfono</label>
-          <input type="tel" name="telefono" id="editTelefono">
+          <label>Teléfono (10 dígitos)</label>
+          <input type="text" name="telefono" id="editTelefono" maxlength="10"
+                 onkeypress="return soloNumeros(event)"
+                 onpaste="return false">
         </div>
 
         <div class="form-group">
@@ -382,14 +413,70 @@
     });
   }
 
-  // AUTO-CERRAR ALERTAS DESPUÉS DE 5 SEGUNDOS
+  // AUTO-CERRAR ALERTAS DESPUÉS DE 10 SEGUNDOS
   setTimeout(() => {
-    const alerts = document.querySelectorAll('.alert');
+    const alerts = document.querySelectorAll('.alert-error');
     alerts.forEach(alert => {
       alert.style.opacity = '0';
       setTimeout(() => alert.remove(), 300);
     });
   }, 5000);
+
+  // AUTO-CERRAR ALERTAS DE ÉXITO DESPUÉS DE 10 SEGUNDOS
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert-success');
+    alerts.forEach(alert => {
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 300);
+    });
+  }, 10000);
+
+  // VALIDACIÓN: SOLO LETRAS EN NOMBRE
+  function soloLetras(event) {
+    const char = event.key;
+    const regex = /^[a-záéíóúñüA-ZÁÉÍÓÚÑÜ\s']$/;
+    if (!regex.test(char)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  // VALIDACIÓN: SOLO NÚMEROS EN TELÉFONO
+  function soloNumeros(event) {
+    const char = event.key;
+    const regex = /^[0-9]$/;
+    if (!regex.test(char)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  // AUTO-ABRIR MODAL SI HAY ERROR
+  window.onload = function() {
+    <% if ("crear".equals(request.getAttribute("mostrarModal"))) { %>
+      document.getElementById('modalCrear').style.display = 'block';
+    <% } else if ("editar".equals(request.getAttribute("mostrarModal"))) { %>
+      // Necesitamos poblar los datos del usuario que se estaba editando
+      <% 
+        Integer userId = (Integer) request.getAttribute("formUserId");
+        if (userId != null) {
+      %>
+        abrirModalEditar(
+          <%= userId %>,
+          "<%= request.getAttribute("formNombre") != null ? request.getAttribute("formNombre") : "" %>",
+          "<%= request.getAttribute("formCorreo") != null ? request.getAttribute("formCorreo") : "" %>",
+          "<%= request.getAttribute("formRol") != null ? request.getAttribute("formRol") : "" %>",
+          "<%= request.getAttribute("formTelefono") != null ? request.getAttribute("formTelefono") : "" %>",
+          "<%= request.getAttribute("formDireccion") != null ? request.getAttribute("formDireccion") : "" %>",
+          <%= request.getAttribute("formActivo") != null ? request.getAttribute("formActivo") : "false" %>
+        );
+      <% } %>
+    <% } else if ("password".equals(request.getAttribute("mostrarModal"))) { %>
+      document.getElementById('modalPassword').style.display = 'block';
+    <% } %>
+  };
 </script>
 </body>
 </html>

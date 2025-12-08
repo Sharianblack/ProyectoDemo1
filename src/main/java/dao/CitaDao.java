@@ -216,29 +216,27 @@ public class CitaDao {
         PreparedStatement ps = null;
         boolean success = false;
 
-        String sql = "INSERT INTO citas (id_mascota, id_veterinario, id_sucursal, fecha_cita, hora_cita, estado, observaciones) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO citas (id_mascota, id_veterinario, id_sucursal, fecha_cita, estado, observaciones) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             conn = ConexionBDD.getConnection();
 
             String estadoSafe = normalizarEstado(cita.getEstado());
-            java.sql.Date fecha = null;
-            java.sql.Time hora = null;
-
-            if (cita.getFechaCita() != null) {
-                fecha = new java.sql.Date(cita.getFechaCita().getTime());
-                hora = new java.sql.Time(cita.getFechaCita().getTime());
-            }
 
             ps = conn.prepareStatement(sql);
             ps.setInt(1, cita.getIdMascota());
-            ps.setInt(2, cita.getIdVeterinario()); // 🔥 Ahora es directamente id_usuario
+            ps.setInt(2, cita.getIdVeterinario());
             ps.setInt(3, cita.getIdSucursal());
-            if (fecha != null) ps.setDate(4, fecha); else ps.setNull(4, Types.DATE);
-            if (hora != null) ps.setTime(5, hora); else ps.setNull(5, Types.TIME);
-            ps.setString(6, estadoSafe);
-            ps.setString(7, cita.getObservaciones());
+            
+            if (cita.getFechaCita() != null) {
+                ps.setTimestamp(4, cita.getFechaCita());
+            } else {
+                ps.setNull(4, Types.TIMESTAMP);
+            }
+            
+            ps.setString(5, estadoSafe);
+            ps.setString(6, cita.getObservaciones());
 
             int result = ps.executeUpdate();
             success = (result > 0);
@@ -472,16 +470,18 @@ public class CitaDao {
 
         String sql = "SELECT " +
                 "c.id_cita, c.id_mascota, c.id_veterinario, c.id_sucursal, " +
-                "c.fecha_cita, c.hora_cita, c.estado, c.observaciones, " +
+                "c.fecha_cita, c.estado, c.observaciones, " +
                 "m.nombre AS nombre_mascota, m.especie AS especie_mascota, " +
                 "u.Nombre AS nombre_cliente, u.Correo AS correo_cliente, u.Telefono AS telefono_cliente, " +
+                "v.Nombre AS nombre_veterinario, " +
                 "s.nombre AS nombre_sucursal " +
                 "FROM citas c " +
                 "INNER JOIN mascotas m ON c.id_mascota = m.id_mascota " +
                 "INNER JOIN usuarios u ON m.id_usuario_propietario = u.id_usuario " +
+                "INNER JOIN usuarios v ON c.id_veterinario = v.id_usuario " +
                 "INNER JOIN sucursales s ON c.id_sucursal = s.id_sucursal " +
                 "WHERE m.id_usuario_propietario = ? " +
-                "ORDER BY c.fecha_cita DESC, c.hora_cita DESC";
+                "ORDER BY c.fecha_cita DESC";
 
         try {
             conn = ConexionBDD.getConnection();
@@ -495,21 +495,7 @@ public class CitaDao {
                 cita.setIdMascota(rs.getInt("id_mascota"));
                 cita.setIdVeterinario(rs.getInt("id_veterinario"));
                 cita.setIdSucursal(rs.getInt("id_sucursal"));
-
-                // Construir Timestamp a partir de fecha (DATE) + hora (TIME)
-                java.sql.Date fechaDate = rs.getDate("fecha_cita");
-                java.sql.Time horaTime = null;
-                try { horaTime = rs.getTime("hora_cita"); } catch (SQLException ignored) { }
-
-                if (fechaDate != null) {
-                    long fechaMillis = fechaDate.getTime();
-                    long horaMillis = (horaTime != null) ? (horaTime.getTime() % (24L * 60L * 60L * 1000L)) : 0L;
-                    cita.setFechaCita(new java.sql.Timestamp(fechaMillis + horaMillis));
-                } else {
-                    // Fallback: si no hay fecha_cita como DATE, intentar Timestamp directo
-                    try { cita.setFechaCita(rs.getTimestamp("fecha_cita")); } catch (SQLException ignored) { cita.setFechaCita(null); }
-                }
-
+                cita.setFechaCita(rs.getTimestamp("fecha_cita"));
                 cita.setEstado(rs.getString("estado"));
                 cita.setObservaciones(rs.getString("observaciones"));
                 cita.setNombreMascota(rs.getString("nombre_mascota"));
@@ -517,6 +503,7 @@ public class CitaDao {
                 cita.setNombreCliente(rs.getString("nombre_cliente"));
                 cita.setCorreoCliente(rs.getString("correo_cliente"));
                 cita.setTelefonoCliente(rs.getString("telefono_cliente"));
+                cita.setNombreVeterinario(rs.getString("nombre_veterinario"));
                 cita.setNombreSucursal(rs.getString("nombre_sucursal"));
 
                 citas.add(cita);
@@ -566,6 +553,62 @@ public class CitaDao {
         }
 
         return sucursales;
+    }
+
+    // ========================================================================
+    // OBTENER PACIENTES (MASCOTAS) DEL VETERINARIO
+    // ========================================================================
+    public List<Object[]> obtenerPacientesVeterinario(int idVeterinario) {
+        List<Object[]> pacientes = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT DISTINCT " +
+                "m.id_mascota, m.nombre, m.especie, m.raza, m.sexo, m.fecha_nacimiento, " +
+                "u.Nombre AS nombre_propietario, u.Correo AS correo_propietario, u.Telefono AS telefono_propietario, " +
+                "COUNT(c.id_cita) AS total_citas, " +
+                "MAX(c.fecha_cita) AS ultima_cita " +
+                "FROM citas c " +
+                "INNER JOIN mascotas m ON c.id_mascota = m.id_mascota " +
+                "INNER JOIN usuarios u ON m.id_usuario_propietario = u.id_usuario " +
+                "WHERE c.id_veterinario = ? " +
+                "GROUP BY m.id_mascota, m.nombre, m.especie, m.raza, m.sexo, m.fecha_nacimiento, " +
+                "u.Nombre, u.Correo, u.Telefono " +
+                "ORDER BY MAX(c.fecha_cita) DESC";
+
+        try {
+            conn = ConexionBDD.getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, idVeterinario);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Object[] paciente = new Object[11];
+                paciente[0] = rs.getInt("id_mascota");
+                paciente[1] = rs.getString("nombre");
+                paciente[2] = rs.getString("especie");
+                paciente[3] = rs.getString("raza");
+                paciente[4] = rs.getString("sexo");
+                paciente[5] = rs.getDate("fecha_nacimiento");
+                paciente[6] = rs.getString("nombre_propietario");
+                paciente[7] = rs.getString("correo_propietario");
+                paciente[8] = rs.getString("telefono_propietario");
+                paciente[9] = rs.getInt("total_citas");
+                paciente[10] = rs.getTimestamp("ultima_cita");
+                pacientes.add(paciente);
+            }
+
+            System.out.println("✅ Se obtuvieron " + pacientes.size() + " pacientes para veterinario ID: " + idVeterinario);
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error al obtener pacientes del veterinario");
+            e.printStackTrace();
+        } finally {
+            cerrarRecursos(rs, ps, conn);
+        }
+
+        return pacientes;
     }
 
     // ========================================================================

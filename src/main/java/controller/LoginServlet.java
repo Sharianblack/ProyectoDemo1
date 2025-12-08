@@ -41,12 +41,21 @@ public class LoginServlet extends HttpServlet {
         Usuario user = userDAO.validateUser(correo, password);
 
         if (user != null) {
+            // Verificar si el usuario está bloqueado (id = -1)
+            if (user.getId() == -1) {
+                System.out.println("🚫 Intento de login con usuario bloqueado: " + correo);
+                request.setAttribute("errorMessage", "⛔ Usuario bloqueado. Contáctese con nuestro soporte.");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+            
             // Login exitoso
             System.out.println("✓ Login exitoso para: " + correo + " - Rol: " + user.getRol());
 
             // Crear sesión y guardar datos del usuario
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
+            session.setAttribute("usuario", user); // ← Para el filtro de autenticación
             session.setAttribute("username", user.getCorreo());
             session.setAttribute("nombre", user.getNombre());
             session.setAttribute("userId", user.getId());

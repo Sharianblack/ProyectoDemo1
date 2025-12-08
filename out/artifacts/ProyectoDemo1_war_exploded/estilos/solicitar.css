@@ -183,3 +183,71 @@ body {
     margin-bottom: 0.5rem;
     color: #555;
 }
+
+/* ========================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ======================================== */
+
+/* Tablets (768px o menos) */
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 90%;
+    }
+
+    .header {
+        padding: 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-icon {
+        font-size: 2.5rem;
+    }
+
+    .content {
+        padding: 1.5rem;
+    }
+}
+
+/* Móviles (480px o menos) */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    .header {
+        padding: 1.2rem;
+    }
+
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .header p {
+        font-size: 0.9rem;
+    }
+
+    .content {
+        padding: 1.2rem;
+    }
+
+    .form-group input {
+        padding: 0.6rem;
+        font-size: 14px;
+    }
+
+    .btn-submit {
+        padding: 0.7rem;
+        font-size: 14px;
+    }
+
+    .footer-links a {
+        font-size: 0.9rem;
+    }
+}

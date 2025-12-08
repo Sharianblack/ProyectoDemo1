@@ -4,6 +4,7 @@ import model.Usuario;
 import dao.UsuarioDao;
 import dao.EmailVerificationTokenDao;
 import util.EmailUtil;
+import util.ValidacionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -151,12 +152,47 @@ public class VeterinarioClienteServlet extends HttpServlet {
             String telefono = request.getParameter("telefono");
             String direccion = request.getParameter("direccion");
 
-            // Validaciones básicas
-            if (nombre == null || nombre.trim().isEmpty() ||
-                    correo == null || correo.trim().isEmpty() ||
-                    password == null || password.trim().isEmpty()) {
+            // Guardar datos para mantenerlos en caso de error
+            request.setAttribute("formNombre", nombre);
+            request.setAttribute("formCorreo", correo);
+            request.setAttribute("formTelefono", telefono);
+            request.setAttribute("formDireccion", direccion);
+            request.setAttribute("mostrarModal", "crear");
 
-                request.setAttribute("error", "Nombre, correo y contraseña son obligatorios");
+            // Validar campos obligatorios con ValidacionUtil
+            if (!ValidacionUtil.noEstaVacio(nombre)) {
+                request.setAttribute("error", "El nombre es requerido");
+                listarClientes(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esNombreValido(nombre)) {
+                request.setAttribute("error", "El nombre solo debe contener letras y espacios");
+                listarClientes(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esTextoValido(nombre, 3, 100)) {
+                request.setAttribute("error", "El nombre debe tener entre 3 y 100 caracteres");
+                listarClientes(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esEmailValido(correo)) {
+                request.setAttribute("error", "El correo electrónico no es válido");
+                listarClientes(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esPasswordValido(password)) {
+                request.setAttribute("error", "La contraseña debe tener al menos 6 caracteres");
+                listarClientes(request, response);
+                return;
+            }
+
+            // Validar teléfono si se proporciona
+            if (ValidacionUtil.noEstaVacio(telefono) && !ValidacionUtil.esTelefonoValido(telefono)) {
+                request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
                 listarClientes(request, response);
                 return;
             }
@@ -164,14 +200,14 @@ public class VeterinarioClienteServlet extends HttpServlet {
             // 🔥 VALIDAR FORMATO DE EMAIL
             String mensajeValidacion = util.EmailValidator.validarConMensaje(correo);
             if (mensajeValidacion != null) {
-                request.setAttribute("error", "❌ Correo inválido: " + mensajeValidacion);
+                request.setAttribute("error", "Correo inválido: " + mensajeValidacion);
                 listarClientes(request, response);
                 return;
             }
 
             // 🔥 RECHAZAR EMAILS TEMPORALES
             if (util.EmailValidator.esEmailTemporal(correo)) {
-                request.setAttribute("error", "❌ No se permiten correos temporales o desechables");
+                request.setAttribute("error", "No se permiten correos temporales o desechables");
                 listarClientes(request, response);
                 return;
             }
@@ -188,26 +224,37 @@ public class VeterinarioClienteServlet extends HttpServlet {
 
             // 🔥 NUEVA VALIDACIÓN: Verificar si tiene token pendiente
             if (tokenDao.tienTokenPendiente(correo)) {
-                request.setAttribute("warning",
-                        "⚠️ Este correo tiene una verificación pendiente del registro público. " +
+                request.setAttribute("error",
+                        "Este correo tiene una verificación pendiente del registro público. " +
                                 "El usuario debe completar esa verificación primero o esperar 24 horas.");
                 listarClientes(request, response);
                 return;
             }
 
+            // Sanitizar datos
+            String nombreSanitizado = ValidacionUtil.sanitizar(nombre.trim());
+            String direccionSanitizada = ValidacionUtil.sanitizar(direccion != null ? direccion.trim() : "");
+
             // Crear cliente (ROL FIJO: Cliente)
             Usuario nuevoCliente = new Usuario();
-            nuevoCliente.setNombre(nombre.trim());
+            nuevoCliente.setNombre(nombreSanitizado);
             nuevoCliente.setCorreo(correo);
             nuevoCliente.setPasswordHash(password);
             nuevoCliente.setRol("Cliente");
             nuevoCliente.setTelefono(telefono != null ? telefono.trim() : "");
-            nuevoCliente.setDireccion(direccion != null ? direccion.trim() : "");
+            nuevoCliente.setDireccion(direccionSanitizada);
             nuevoCliente.setActivo(true);
 
             boolean creado = usuarioDao.crearUsuario(nuevoCliente);
 
             if (creado) {
+                // Limpiar atributos del formulario
+                request.removeAttribute("formNombre");
+                request.removeAttribute("formCorreo");
+                request.removeAttribute("formTelefono");
+                request.removeAttribute("formDireccion");
+                request.removeAttribute("mostrarModal");
+
                 // Enviar correo de bienvenida
                 try {
                     String urlLogin = request.getScheme() + "://" +

@@ -22,16 +22,20 @@ public class UsuarioDao {
         try {
             conn = ConexionBDD.getConnection();
 
-            // 🔥 OBTENER EL HASH DE LA BD
+            // 🔥 PRIMERO VERIFICAR SI EL USUARIO EXISTE (ACTIVO O INACTIVO)
             String sql = "SELECT id_usuario, Nombre, Correo, PasswordHash, Rol, Telefono, Direccion, activo " +
-                    "FROM Usuarios WHERE Correo = ? AND activo = 1";
+                    "FROM Usuarios WHERE Correo = ?";
 
             ps = conn.prepareStatement(sql);
             ps.setString(1, username);
             rs = ps.executeQuery();
 
             if (rs.next()) {
+                int activoValue = rs.getInt("activo");
+                boolean usuarioActivo = (activoValue == 1);
                 String storedHash = rs.getString("PasswordHash");
+
+                System.out.println("📊 Usuario encontrado - Activo: " + activoValue + " (boolean: " + usuarioActivo + ")");
 
                 // 🔥 VERIFICAR CONTRASEÑA CON BCRYPT
                 boolean passwordMatch;
@@ -52,6 +56,16 @@ public class UsuarioDao {
                 }
 
                 if (passwordMatch) {
+                    // Verificar si el usuario está activo
+                    if (!usuarioActivo) {
+                        System.out.println("🚫 Usuario bloqueado: " + username + " (activo=" + activoValue + ")");
+                        // Retornar un usuario especial con id = -1 para indicar "bloqueado"
+                        user = new Usuario();
+                        user.setId(-1); // Indicador de usuario bloqueado
+                        user.setCorreo(username);
+                        return user;
+                    }
+                    
                     user = new Usuario();
                     user.setId(rs.getInt("id_usuario"));
                     user.setNombre(rs.getString("Nombre"));
@@ -66,7 +80,7 @@ public class UsuarioDao {
                     System.out.println("❌ Contraseña incorrecta para: " + username);
                 }
             } else {
-                System.out.println("❌ Usuario no encontrado o inactivo");
+                System.out.println("❌ Usuario no encontrado");
             }
         } catch (SQLException e) {
             System.out.println("❌ Error en validateUser");

@@ -2,6 +2,7 @@ package controller;
 
 import model.Mascota;
 import dao.MascotaDao;
+import util.ValidacionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -150,6 +151,13 @@ public class MascotaServlet extends HttpServlet {
             HttpSession session = request.getSession();
             Integer userId = (Integer) session.getAttribute("userId");
 
+            // Validar sesión
+            if (userId == null) {
+                request.setAttribute("error", "Sesión inválida");
+                response.sendRedirect("login.jsp");
+                return;
+            }
+
             // Obtener datos del formulario
             String nombre = request.getParameter("nombre");
             String especie = request.getParameter("especie");
@@ -157,21 +165,76 @@ public class MascotaServlet extends HttpServlet {
             String sexo = request.getParameter("sexo");
             String fechaNacStr = request.getParameter("fechaNacimiento");
 
-            // Validaciones básicas
-            if (nombre == null || nombre.trim().isEmpty() ||
-                    especie == null || especie.trim().isEmpty()) {
+            // Preservar datos del formulario
+            request.setAttribute("formNombre", nombre);
+            request.setAttribute("formEspecie", especie);
+            request.setAttribute("formRaza", raza);
+            request.setAttribute("formSexo", sexo);
+            request.setAttribute("formFechaNacimiento", fechaNacStr);
+            request.setAttribute("mostrarModal", "crear");
 
-                request.setAttribute("error", "Nombre y especie son obligatorios");
+            // Validar campos obligatorios
+            if (!ValidacionUtil.noEstaVacio(nombre)) {
+                request.setAttribute("error", "El nombre de la mascota es requerido");
                 listarMascotas(request, response);
                 return;
             }
 
+            if (!ValidacionUtil.esTextoValido(nombre, 2, 50)) {
+                request.setAttribute("error", "El nombre debe tener entre 2 y 50 caracteres");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esNombreValido(nombre)) {
+                request.setAttribute("error", "El nombre solo debe contener letras y espacios");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(especie)) {
+                request.setAttribute("error", "La especie es requerida");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esTextoValido(especie, 2, 50)) {
+                request.setAttribute("error", "La especie debe tener entre 2 y 50 caracteres");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Validar sexo (ahora es obligatorio)
+            if (!ValidacionUtil.noEstaVacio(sexo)) {
+                request.setAttribute("error", "El sexo es obligatorio");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!sexo.equals("M") && !sexo.equals("H")) {
+                request.setAttribute("error", "El sexo debe ser M (Macho) o H (Hembra)");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Validar fecha de nacimiento si se proporciona
+            if (ValidacionUtil.noEstaVacio(fechaNacStr) && !ValidacionUtil.esFechaValida(fechaNacStr)) {
+                request.setAttribute("error", "Fecha de nacimiento inválida. Use formato YYYY-MM-DD");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Sanitizar datos
+            String nombreSanitizado = ValidacionUtil.sanitizar(nombre.trim());
+            String especieSanitizada = ValidacionUtil.sanitizar(especie.trim());
+            String razaSanitizada = ValidacionUtil.sanitizar(raza != null ? raza.trim() : "");
+
             // Crear mascota
             Mascota nuevaMascota = new Mascota();
             nuevaMascota.setIdUsuarioPropietario(userId); // 🔥 Usa id_usuario directamente
-            nuevaMascota.setNombre(nombre.trim());
-            nuevaMascota.setEspecie(especie.trim());
-            nuevaMascota.setRaza(raza != null ? raza.trim() : "");
+            nuevaMascota.setNombre(nombreSanitizado);
+            nuevaMascota.setEspecie(especieSanitizada);
+            nuevaMascota.setRaza(razaSanitizada);
             nuevaMascota.setSexo(sexo);
 
             if (fechaNacStr != null && !fechaNacStr.trim().isEmpty()) {
@@ -181,13 +244,24 @@ public class MascotaServlet extends HttpServlet {
             boolean creado = mascotaDao.crearMascota(nuevaMascota);
 
             if (creado) {
-                request.setAttribute("success", "✅ Mascota '" + nombre + "' registrada exitosamente");
-                System.out.println("✅ Mascota creada: " + nombre);
+                // Limpiar atributos del formulario
+                request.removeAttribute("formNombre");
+                request.removeAttribute("formEspecie");
+                request.removeAttribute("formRaza");
+                request.removeAttribute("formSexo");
+                request.removeAttribute("formFechaNacimiento");
+                request.removeAttribute("mostrarModal");
+
+                request.setAttribute("success", "✅ Mascota '" + nombreSanitizado + "' registrada exitosamente");
+                System.out.println("✅ Mascota creada: " + nombreSanitizado);
             } else {
                 request.setAttribute("error", "Error al registrar la mascota");
-                System.out.println("❌ Error al crear mascota: " + nombre);
+                System.out.println("❌ Error al crear mascota: " + nombreSanitizado);
             }
 
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "Fecha de nacimiento inválida");
+            e.printStackTrace();
         } catch (Exception e) {
             request.setAttribute("error", "Error inesperado: " + e.getMessage());
             e.printStackTrace();
@@ -206,7 +280,22 @@ public class MascotaServlet extends HttpServlet {
             HttpSession session = request.getSession();
             Integer userId = (Integer) session.getAttribute("userId");
 
-            int idMascota = Integer.parseInt(request.getParameter("idMascota"));
+            String idMascotaStr = request.getParameter("idMascota");
+
+            // Validar ID
+            if (!ValidacionUtil.noEstaVacio(idMascotaStr)) {
+                request.setAttribute("error", "ID de mascota es requerido");
+                listarMascotas(request, response);
+                return;
+            }
+
+            int idMascota = Integer.parseInt(idMascotaStr);
+
+            if (!ValidacionUtil.esIdValido(idMascota)) {
+                request.setAttribute("error", "ID de mascota inválido");
+                listarMascotas(request, response);
+                return;
+            }
 
             // Verificar que la mascota pertenezca al usuario
             if (!mascotaDao.mascotaPerteneceAUsuario(idMascota, userId)) {
@@ -222,21 +311,65 @@ public class MascotaServlet extends HttpServlet {
             String sexo = request.getParameter("sexo");
             String fechaNacStr = request.getParameter("fechaNacimiento");
 
-            // Validaciones básicas
-            if (nombre == null || nombre.trim().isEmpty() ||
-                    especie == null || especie.trim().isEmpty()) {
+            // Preservar datos del formulario
+            request.setAttribute("formIdMascota", idMascotaStr);
+            request.setAttribute("formNombre", nombre);
+            request.setAttribute("formEspecie", especie);
+            request.setAttribute("formRaza", raza);
+            request.setAttribute("formSexo", sexo);
+            request.setAttribute("formFechaNacimiento", fechaNacStr);
+            request.setAttribute("mostrarModal", "editar");
 
-                request.setAttribute("error", "Nombre y especie son obligatorios");
+            // Validar campos obligatorios
+            if (!ValidacionUtil.noEstaVacio(nombre) || !ValidacionUtil.esTextoValido(nombre, 2, 50)) {
+                request.setAttribute("error", "El nombre debe tener entre 2 y 50 caracteres");
                 listarMascotas(request, response);
                 return;
             }
 
+            if (!ValidacionUtil.esNombreValido(nombre)) {
+                request.setAttribute("error", "El nombre solo debe contener letras y espacios");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(especie) || !ValidacionUtil.esTextoValido(especie, 2, 50)) {
+                request.setAttribute("error", "La especie debe tener entre 2 y 50 caracteres");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Validar sexo (ahora es obligatorio)
+            if (!ValidacionUtil.noEstaVacio(sexo)) {
+                request.setAttribute("error", "El sexo es obligatorio");
+                listarMascotas(request, response);
+                return;
+            }
+
+            if (!sexo.equals("M") && !sexo.equals("H")) {
+                request.setAttribute("error", "El sexo debe ser M (Macho) o H (Hembra)");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Validar fecha
+            if (ValidacionUtil.noEstaVacio(fechaNacStr) && !ValidacionUtil.esFechaValida(fechaNacStr)) {
+                request.setAttribute("error", "Fecha de nacimiento inválida");
+                listarMascotas(request, response);
+                return;
+            }
+
+            // Sanitizar datos
+            String nombreSanitizado = ValidacionUtil.sanitizar(nombre.trim());
+            String especieSanitizada = ValidacionUtil.sanitizar(especie.trim());
+            String razaSanitizada = ValidacionUtil.sanitizar(raza != null ? raza.trim() : "");
+
             // Actualizar mascota
             Mascota mascota = new Mascota();
             mascota.setIdMascota(idMascota);
-            mascota.setNombre(nombre.trim());
-            mascota.setEspecie(especie.trim());
-            mascota.setRaza(raza != null ? raza.trim() : "");
+            mascota.setNombre(nombreSanitizado);
+            mascota.setEspecie(especieSanitizada);
+            mascota.setRaza(razaSanitizada);
             mascota.setSexo(sexo);
 
             if (fechaNacStr != null && !fechaNacStr.trim().isEmpty()) {
@@ -246,7 +379,16 @@ public class MascotaServlet extends HttpServlet {
             boolean actualizado = mascotaDao.actualizarMascota(mascota);
 
             if (actualizado) {
-                request.setAttribute("success", "✅ Mascota '" + nombre + "' actualizada exitosamente");
+                // Limpiar atributos del formulario
+                request.removeAttribute("formIdMascota");
+                request.removeAttribute("formNombre");
+                request.removeAttribute("formEspecie");
+                request.removeAttribute("formRaza");
+                request.removeAttribute("formSexo");
+                request.removeAttribute("formFechaNacimiento");
+                request.removeAttribute("mostrarModal");
+
+                request.setAttribute("success", "✅ Mascota '" + nombreSanitizado + "' actualizada exitosamente");
                 System.out.println("✅ Mascota actualizada: ID " + idMascota);
             } else {
                 request.setAttribute("error", "Error al actualizar la mascota");

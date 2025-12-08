@@ -2,6 +2,7 @@ package controller;
 
 import model.Cita;
 import dao.CitaDao;
+import util.ValidacionUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -158,6 +159,11 @@ public class CitaServlet extends HttpServlet {
             return;
         }
 
+        // DEBUG: confirmar que la acción se invocó y desde qué usuario/rol
+        try {
+            System.out.println("→ listarCitasCliente invoked for userId=" + userId + " rol=" + session.getAttribute("rol"));
+        } catch (Exception ignored) { }
+
         List<Cita> citas = citaDao.obtenerCitasCliente(userId);
 
         request.setAttribute("citas", citas);
@@ -216,11 +222,34 @@ public class CitaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            int idCita = Integer.parseInt(request.getParameter("idCita"));
+            String idCitaStr = request.getParameter("idCita");
             String nuevoEstado = request.getParameter("nuevoEstado");
 
-            if (nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
+            // Validar parámetros
+            if (!ValidacionUtil.noEstaVacio(idCitaStr)) {
+                request.setAttribute("error", "ID de cita es requerido");
+                listarCitas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(nuevoEstado)) {
                 request.setAttribute("error", "Estado inválido");
+                listarCitas(request, response);
+                return;
+            }
+
+            // Validar que el estado sea uno válido
+            if (!nuevoEstado.equals("Programada") && !nuevoEstado.equals("En Proceso") && 
+                !nuevoEstado.equals("Completada") && !nuevoEstado.equals("Cancelada")) {
+                request.setAttribute("error", "Estado no válido");
+                listarCitas(request, response);
+                return;
+            }
+
+            int idCita = Integer.parseInt(idCitaStr);
+
+            if (!ValidacionUtil.esIdValido(idCita)) {
+                request.setAttribute("error", "ID de cita inválido");
                 listarCitas(request, response);
                 return;
             }
@@ -253,10 +282,28 @@ public class CitaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            int idCita = Integer.parseInt(request.getParameter("idCita"));
+            String idCitaStr = request.getParameter("idCita");
             String observaciones = request.getParameter("observaciones");
 
-            boolean actualizado = citaDao.actualizarObservaciones(idCita, observaciones);
+            // Validar ID
+            if (!ValidacionUtil.noEstaVacio(idCitaStr)) {
+                request.setAttribute("error", "ID de cita es requerido");
+                listarCitas(request, response);
+                return;
+            }
+
+            int idCita = Integer.parseInt(idCitaStr);
+
+            if (!ValidacionUtil.esIdValido(idCita)) {
+                request.setAttribute("error", "ID de cita inválido");
+                listarCitas(request, response);
+                return;
+            }
+
+            // Sanitizar observaciones
+            String observacionesSanitizadas = ValidacionUtil.sanitizar(observaciones != null ? observaciones : "");
+
+            boolean actualizado = citaDao.actualizarObservaciones(idCita, observacionesSanitizadas);
 
             if (actualizado) {
                 request.setAttribute("success", "Observaciones actualizadas exitosamente");
@@ -361,12 +408,57 @@ public class CitaServlet extends HttpServlet {
             HttpSession session = request.getSession();
             Integer vetId = (Integer) session.getAttribute("userId");
 
-            // Obtener datos del formulario
-            int idMascota = Integer.parseInt(request.getParameter("idMascota"));
-            int idSucursal = Integer.parseInt(request.getParameter("idSucursal"));
+            // Validar sesión
+            if (vetId == null) {
+                request.setAttribute("error", "Sesión inválida");
+                response.sendRedirect("login.jsp");
+                return;
+            }
+
+            // Obtener y validar parámetros
+            String idMascotaStr = request.getParameter("idMascota");
+            String idSucursalStr = request.getParameter("idSucursal");
             String fechaStr = request.getParameter("fecha");
             String horaStr = request.getParameter("hora");
             String observaciones = request.getParameter("observaciones");
+
+            // Validar que los campos obligatorios no estén vacíos
+            if (!ValidacionUtil.noEstaVacio(idMascotaStr)) {
+                request.setAttribute("error", "Debe seleccionar una mascota");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(idSucursalStr)) {
+                request.setAttribute("error", "Debe seleccionar una sucursal");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esFechaValida(fechaStr)) {
+                request.setAttribute("error", "Fecha inválida. Use formato YYYY-MM-DD");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esHoraValida(horaStr)) {
+                request.setAttribute("error", "Hora inválida. Use formato HH:MM");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            // Convertir y validar IDs
+            int idMascota = Integer.parseInt(idMascotaStr);
+            int idSucursal = Integer.parseInt(idSucursalStr);
+
+            if (!ValidacionUtil.esIdValido(idMascota) || !ValidacionUtil.esIdValido(idSucursal)) {
+                request.setAttribute("error", "IDs inválidos");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            // Sanitizar observaciones
+            String observacionesSanitizadas = ValidacionUtil.sanitizar(observaciones != null ? observaciones : "");
 
             // Combinar fecha y hora
             String fechaHoraStr = fechaStr + " " + horaStr + ":00";
@@ -379,7 +471,7 @@ public class CitaServlet extends HttpServlet {
             nuevaCita.setIdSucursal(idSucursal);
             nuevaCita.setFechaCita(fechaCita);
             nuevaCita.setEstado("Programada");
-            nuevaCita.setObservaciones(observaciones);
+            nuevaCita.setObservaciones(observacionesSanitizadas);
 
             boolean creada = citaDao.crearCita(nuevaCita);
 
@@ -390,9 +482,16 @@ public class CitaServlet extends HttpServlet {
                 request.setAttribute("error", "Error al crear la cita");
             }
 
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Formato de número inválido");
+            e.printStackTrace();
+            mostrarFormularioCrear(request, response);
+            return;
         } catch (Exception e) {
             request.setAttribute("error", "Error al procesar la cita: " + e.getMessage());
             e.printStackTrace();
+            mostrarFormularioCrear(request, response);
+            return;
         }
 
         listarCitas(request, response);

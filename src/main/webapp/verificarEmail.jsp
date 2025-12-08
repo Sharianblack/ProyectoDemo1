@@ -28,20 +28,7 @@
 </div>
 
 <script>
-    // Obtener el token de la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-
-    // Validar que exista el token
-    if (!token || token.trim() === '') {
-        alert('❌ Token de verificación no válido');
-        window.location.href = 'login.jsp';
-    } else {
-        // Redirigir al servlet después de 2 segundos (tiempo de la animación)
-        setTimeout(function() {
-            window.location.href = 'EmailVerificationServlet?token=' + encodeURIComponent(token);
-        }, 2000);
-    }
+    // Eliminado: Validación de token por JavaScript
 </script>
 </body>
 </html>

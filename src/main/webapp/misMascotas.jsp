@@ -123,17 +123,24 @@
     <div class="modal-header">
       <h3>➕ Registrar Mascota</h3>
     </div>
+    
+    <% if (error != null && "crear".equals(request.getAttribute("mostrarModal"))) { %>
+    <div class="alert alert-error" style="margin: 0 0 1rem 0;">
+      ❌ <%= error %>
+    </div>
+    <% } %>
+    
     <form action="MascotaServlet" method="post">
       <input type="hidden" name="action" value="crear">
 
       <div class="form-group">
         <label>Nombre *</label>
-        <input type="text" name="nombre" required placeholder="Ej: Firulais">
+        <input type="text" name="nombre" placeholder="Ej: Firulais">
       </div>
 
       <div class="form-group">
         <label>Especie *</label>
-        <select name="especie" required>
+        <select name="especie">
           <option value="">Seleccionar...</option>
           <option value="Perro">🐕 Perro</option>
           <option value="Gato">🐈 Gato</option>
@@ -176,18 +183,25 @@
     <div class="modal-header">
       <h3>✏️ Editar Mascota</h3>
     </div>
+    
+    <% if (error != null && "editar".equals(request.getAttribute("mostrarModal"))) { %>
+    <div class="alert alert-error" style="margin: 0 0 1rem 0;">
+      ❌ <%= error %>
+    </div>
+    <% } %>
+    
     <form action="MascotaServlet" method="post">
       <input type="hidden" name="action" value="actualizar">
       <input type="hidden" name="idMascota" id="editIdMascota">
 
       <div class="form-group">
         <label>Nombre *</label>
-        <input type="text" name="nombre" id="editNombre" required>
+        <input type="text" name="nombre" id="editNombre">
       </div>
 
       <div class="form-group">
         <label>Especie *</label>
-        <select name="especie" id="editEspecie" required>
+        <select name="especie" id="editEspecie">
           <option value="Perro">🐕 Perro</option>
           <option value="Gato">🐈 Gato</option>
           <option value="Ave">🐦 Ave</option>
@@ -203,9 +217,9 @@
       </div>
 
       <div class="form-group">
-        <label>Sexo</label>
+        <label>Sexo *</label>
         <select name="sexo" id="editSexo">
-          <option value="">No especificado</option>
+          <option value="">Seleccionar...</option>
           <option value="M">Macho</option>
           <option value="H">Hembra</option>
         </select>
@@ -274,6 +288,15 @@
       event.target.style.display = 'none';
     }
   }
+
+  // Auto-abrir modal si hay error de validación
+  window.onload = function() {
+    <% if ("crear".equals(request.getAttribute("mostrarModal"))) { %>
+      document.getElementById('modalCrear').style.display = 'block';
+    <% } else if ("editar".equals(request.getAttribute("mostrarModal"))) { %>
+      document.getElementById('modalEditar').style.display = 'block';
+    <% } %>
+  };
 
   // Ocultar alertas automáticamente
   setTimeout(() => {

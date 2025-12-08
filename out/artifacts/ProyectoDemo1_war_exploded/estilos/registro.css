@@ -176,3 +176,78 @@ input:focus {
 .strength-weak { background: #dc3545; width: 33%; }
 .strength-medium { background: #ffc107; width: 66%; }
 .strength-strong { background: #28a745; width: 100%; }
+
+/* ========================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ======================================== */
+
+/* Tablets y pantallas medianas (768px o menos) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    .registro-container {
+        padding: 30px 25px;
+        max-width: 100%;
+    }
+
+    .logo h1 {
+        font-size: 24px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-row .form-group {
+        flex: 1 1 100%;
+    }
+}
+
+/* Móviles (480px o menos) */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .registro-container {
+        padding: 25px 20px;
+        border-radius: 15px;
+    }
+
+    .logo h1 {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .logo p {
+        font-size: 12px;
+    }
+
+    .alert,
+    .info-box {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    input,
+    select {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .btn-registro {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .login-link {
+        font-size: 13px;
+    }
+}

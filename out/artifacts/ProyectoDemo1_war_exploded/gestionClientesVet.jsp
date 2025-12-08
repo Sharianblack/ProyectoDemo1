@@ -173,35 +173,50 @@
       <h3>➕ Registrar Nuevo Cliente</h3>
       <span class="close" onclick="cerrarModal('modalCrear')">&times;</span>
     </div>
+    
+    <% if (request.getAttribute("error") != null && "crear".equals(request.getAttribute("mostrarModal"))) { %>
+    <div class="alert alert-error" style="margin-bottom: 1rem; padding: 0.75rem; background-color: #fee; border-left: 4px solid #dc3545; color: #721c24;">
+      <%= request.getAttribute("error") %>
+    </div>
+    <% } %>
+    
     <form action="VeterinarioClienteServlet" method="post">
       <input type="hidden" name="action" value="crear">
 
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
-        <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
+        <input type="text" name="nombre" placeholder="Ej: Juan Pérez" 
+               value="<%= request.getAttribute("formNombre") != null ? request.getAttribute("formNombre") : "" %>"
+               onkeypress="return soloLetras(event)"
+               onpaste="return false">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Correo Electrónico <span class="required">*</span></label>
-          <input type="email" name="correo" required placeholder="cliente@ejemplo.com">
+          <input type="text" name="correo" placeholder="cliente@ejemplo.com"
+                 value="<%= request.getAttribute("formCorreo") != null ? request.getAttribute("formCorreo") : "" %>">
         </div>
 
         <div class="form-group">
           <label>Contraseña <span class="required">*</span></label>
-          <input type="password" name="password" required placeholder="Mínimo 4 caracteres" minlength="4">
+          <input type="password" name="password" placeholder="Mínimo 6 caracteres">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>Teléfono</label>
-          <input type="tel" name="telefono" placeholder="0999999999">
+          <label>Teléfono (10 dígitos)</label>
+          <input type="text" name="telefono" placeholder="0999999999" maxlength="10"
+                 value="<%= request.getAttribute("formTelefono") != null ? request.getAttribute("formTelefono") : "" %>"
+                 onkeypress="return soloNumeros(event)"
+                 onpaste="return false">
         </div>
 
         <div class="form-group">
           <label>Dirección</label>
-          <input type="text" name="direccion" placeholder="Ej: Av. Principal 123">
+          <input type="text" name="direccion" placeholder="Ej: Av. Principal 123"
+                 value="<%= request.getAttribute("formDireccion") != null ? request.getAttribute("formDireccion") : "" %>">
         </div>
       </div>
 
@@ -225,13 +240,13 @@
 
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
-        <input type="text" name="nombre" id="editNombre" required>
+        <input type="text" name="nombre" id="editNombre">
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Correo Electrónico <span class="required">*</span></label>
-          <input type="email" name="correo" id="editCorreo" required>
+          <input type="text" name="correo" id="editCorreo">
         </div>
 
         <div class="form-group">
@@ -261,7 +276,34 @@
 </div>
 
 <script>
-  // El Javascript se mantiene idéntico al original, no requiere cambios
+  // Función para permitir solo letras y espacios
+  function soloLetras(event) {
+    const char = String.fromCharCode(event.which);
+    // Permitir solo letras (mayúsculas, minúsculas, acentos) y espacios
+    if (!/[a-záéíóúñüA-ZÁÉÍÓÚÑÜ\s']/.test(char)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  // Función para permitir solo números
+  function soloNumeros(event) {
+    const char = String.fromCharCode(event.which);
+    if (!/[0-9]/.test(char)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  // Abrir modal automáticamente si hay error
+  window.onload = function() {
+    <% if ("crear".equals(request.getAttribute("mostrarModal"))) { %>
+      document.getElementById('modalCrear').style.display = 'block';
+    <% } %>
+  };
+
   function abrirModalCrear() {
     document.getElementById('modalCrear').style.display = 'block';
   }

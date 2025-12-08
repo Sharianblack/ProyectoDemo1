@@ -130,3 +130,97 @@ body {
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
+
+/* ========================================
+   RESPONSIVE DESIGN - MEDIA QUERIES
+   ======================================== */
+
+/* Tablets y pantallas medianas (768px o menos) */
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .navbar h1 {
+        font-size: 1.2rem;
+    }
+
+    .user-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .content {
+        padding: 0 0.5rem;
+        margin: 1rem auto;
+    }
+
+    .welcome-card {
+        padding: 1.5rem;
+    }
+
+    .welcome-card h2 {
+        font-size: 1.3rem;
+    }
+
+    .admin-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .admin-card {
+        padding: 1.2rem;
+    }
+}
+
+/* Móviles (480px o menos) */
+@media screen and (max-width: 480px) {
+    .navbar h1 {
+        font-size: 1rem;
+    }
+
+    .user-info span {
+        font-size: 0.9rem;
+    }
+
+    .logout-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .welcome-card {
+        padding: 1rem;
+    }
+
+    .welcome-card h2 {
+        font-size: 1.1rem;
+    }
+
+    .welcome-card p {
+        font-size: 0.9rem;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .admin-card {
+        padding: 1rem;
+    }
+
+    .admin-card h3 {
+        font-size: 1rem;
+    }
+
+    .admin-card p {
+        font-size: 0.85rem;
+    }
+
+    .icon {
+        font-size: 1.5rem;
+    }
+}
