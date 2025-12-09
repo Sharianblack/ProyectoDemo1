@@ -17,7 +17,6 @@
 </head>
 <body>
 <div class="verificacion-container">
-    <div class="icon">📧</div>
     <h2>Verificando tu correo<span class="dots"></span></h2>
     <div class="spinner"></div>
     <p>Por favor espera mientras procesamos tu verificación.</p>

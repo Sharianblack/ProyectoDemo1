@@ -51,18 +51,18 @@
 </head>
 <body>
 <nav class="navbar">
-  <h1>👥 Gestión de Usuarios</h1>
+  <h1>Gestión de Usuarios</h1>
   <div class="user-info">
     <span>Admin: <strong><%= nombreUsuario %></strong></span>
-    <span class="admin-badge">⚡ ADMIN</span>
+    <span class="admin-badge">ADMIN</span>
     <a href="PIAdmin.jsp" class="btn-volver">← Volver al Panel</a>
   </div>
 </nav>
 
 <div class="container">
   <div class="page-header">
-    <h2>📋 Lista de Usuarios del Sistema</h2>
-    <button class="btn-nuevo" onclick="abrirModalCrear()">➕ Nuevo Usuario</button>
+    <h2>Lista de Usuarios del Sistema</h2>
+    <button class="btn-nuevo" onclick="abrirModalCrear()">Nuevo Usuario</button>
   </div>
 
   <div class="search-bar">
@@ -71,7 +71,7 @@
       <input
               type="text"
               name="criterio"
-              placeholder="🔍 Buscar por nombre, correo o rol..."
+              placeholder="Buscar por nombre, correo o rol..."
               value="<%= criterio != null ? criterio : "" %>">
       <button type="submit" class="btn-buscar">Buscar</button>
       <% if (criterio != null && !criterio.isEmpty()) { %>
@@ -82,13 +82,13 @@
 
   <% if (success != null) { %>
   <div class="alert alert-success">
-    ✓ <%= success %>
+    <%= success %>
   </div>
   <% } %>
 
   <% if (error != null) { %>
   <div class="alert alert-error">
-    ✗ <%= error %>
+    <%= error %>
   </div>
   <% } %>
 
@@ -116,9 +116,9 @@
         <td><%= u.getTelefono() != null ? u.getTelefono() : "-" %></td>
         <td>
           <% if (u.isActivo()) { %>
-          <span class="badge badge-activo">✓ Activo</span>
+          <span class="badge badge-activo">Activo</span>
           <% } else { %>
-          <span class="badge badge-inactivo">✗ Inactivo</span>
+          <span class="badge badge-inactivo">Inactivo</span>
           <% } %>
         </td>
         <td>
@@ -130,25 +130,25 @@
             %>
             <button class="btn-action btn-edit"
                     onclick="abrirModalEditar(<%= u.getId() %>, '<%= nombreEscapado %>', '<%= u.getCorreo() %>', '<%= u.getRol() %>', '<%= telefonoVal %>', '<%= direccionVal %>', <%= u.isActivo() %>)">
-              ✏️ Editar
+              Editar
             </button>
 
             <button class="btn-action btn-password"
                     onclick="abrirModalPassword(<%= u.getId() %>, '<%= nombreEscapado %>')">
-              🔑 Cambiar Clave
+              Cambiar Clave
             </button>
 
             <% if (u.isActivo()) { %>
             <% if (adminId == null || adminId != u.getId()) { %>
             <button class="btn-action btn-toggle"
                     onclick="cambiarEstado(<%= u.getId() %>, false, '<%= nombreEscapado %>')">
-              🔒 Desactivar
+              Desactivar
             </button>
             <% } %>
             <% } else { %>
             <button class="btn-action btn-activate"
                     onclick="cambiarEstado(<%= u.getId() %>, true, '<%= nombreEscapado %>')">
-              🔓 Activar
+              Activar
             </button>
             <% } %>
           </div>
@@ -163,7 +163,7 @@
     </p>
     <% } else { %>
     <div class="empty-state">
-      <div class="empty-state-icon">📭</div>
+      <div class="empty-state-icon">-</div>
       <h3>No hay usuarios registrados</h3>
       <p>Comienza creando tu primer usuario con el botón "Nuevo Usuario"</p>
     </div>
@@ -174,7 +174,7 @@
 <div id="modalCrear" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>➕ Crear Nuevo Usuario</h3>
+      <h3>Crear Nuevo Usuario</h3>
       <span class="close" onclick="cerrarModal('modalCrear')">&times;</span>
     </div>
     
@@ -190,9 +190,7 @@
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
         <input type="text" name="nombre" placeholder="Ej: Juan Pérez"
-               value="<%= request.getAttribute("formNombre") != null ? request.getAttribute("formNombre") : "" %>"
-               onkeypress="return soloLetras(event)"
-               onpaste="return false">
+               value="<%= request.getAttribute("formNombre") != null ? request.getAttribute("formNombre") : "" %>">
       </div>
 
       <div class="form-row">
@@ -203,13 +201,6 @@
         </div>
 
         <div class="form-group">
-          <label>Contraseña <span class="required">*</span></label>
-          <input type="password" name="password" placeholder="Mínimo 6 caracteres">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
           <label>Rol <span class="required">*</span></label>
           <select name="rol">
             <option value="">Seleccionar...</option>
@@ -218,25 +209,33 @@
             <option value="Veterinario" <%= "Veterinario".equals(request.getAttribute("formRol")) ? "selected" : "" %>>Veterinario</option>
           </select>
         </div>
+      </div>
+      
+      <div class="form-group" style="background: #e8f5e9; padding: 15px; border-radius: 5px; border-left: 4px solid #4caf50;">
+        <p style="margin: 0; color: #2e7d32; font-size: 14px;">
+          <strong>Seguridad:</strong> Se generará automáticamente una contraseña segura de 16 caracteres 
+          (con mayúsculas, minúsculas, números y símbolos) que será enviada al correo del usuario.
+        </p>
+      </div>
 
+      <div class="form-row">
         <div class="form-group">
-          <label>Teléfono (10 dígitos)</label>
-          <input type="text" name="telefono" placeholder="0999999999" maxlength="10"
-                 value="<%= request.getAttribute("formTelefono") != null ? request.getAttribute("formTelefono") : "" %>"
-                 onkeypress="return soloNumeros(event)"
-                 onpaste="return false">
+          <label>Teléfono (10 dígitos) <span class="required">*</span></label>
+          <input type="text" name="telefono" placeholder="0999999999" maxlength="10" pattern="[0-9]{10}"
+                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                 value="<%= request.getAttribute("formTelefono") != null ? request.getAttribute("formTelefono") : "" %>">
         </div>
       </div>
 
       <div class="form-group">
-        <label>Dirección</label>
+        <label>Dirección <span class="required">*</span></label>
         <input type="text" name="direccion" placeholder="Ej: Av. Principal 123"
                value="<%= request.getAttribute("formDireccion") != null ? request.getAttribute("formDireccion") : "" %>">
       </div>
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalCrear')">Cancelar</button>
-        <button type="submit" class="btn-submit">✓ Crear Usuario</button>
+        <button type="submit" class="btn-submit">Crear Usuario</button>
       </div>
     </form>
   </div>
@@ -245,7 +244,7 @@
 <div id="modalEditar" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>✏️ Editar Usuario</h3>
+      <h3>Editar Usuario</h3>
       <span class="close" onclick="cerrarModal('modalEditar')">&times;</span>
     </div>
     
@@ -261,9 +260,7 @@
 
       <div class="form-group">
         <label>Nombre Completo <span class="required">*</span></label>
-        <input type="text" name="nombre" id="editNombre"
-               onkeypress="return soloLetras(event)"
-               onpaste="return false">
+        <input type="text" name="nombre" id="editNombre">
       </div>
 
       <div class="form-row">
@@ -284,14 +281,13 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>Teléfono (10 dígitos)</label>
-          <input type="text" name="telefono" id="editTelefono" maxlength="10"
-                 onkeypress="return soloNumeros(event)"
-                 onpaste="return false">
+          <label>Teléfono (10 dígitos) <span class="required">*</span></label>
+          <input type="text" name="telefono" id="editTelefono" maxlength="10" pattern="[0-9]{10}"
+                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
         </div>
 
         <div class="form-group">
-          <label>Dirección</label>
+          <label>Dirección <span class="required">*</span></label>
           <input type="text" name="direccion" id="editDireccion">
         </div>
       </div>
@@ -305,7 +301,7 @@
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalEditar')">Cancelar</button>
-        <button type="submit" class="btn-submit">✓ Guardar Cambios</button>
+        <button type="submit" class="btn-submit">Guardar Cambios</button>
       </div>
     </form>
   </div>
@@ -314,7 +310,7 @@
 <div id="modalPassword" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>🔑 Cambiar Contraseña</h3>
+      <h3>Cambiar Contraseña</h3>
       <span class="close" onclick="cerrarModal('modalPassword')">&times;</span>
     </div>
     <form action="UsuarioServlet" method="post">
@@ -327,12 +323,12 @@
 
       <div class="form-group">
         <label>Nueva Contraseña <span class="required">*</span></label>
-        <input type="password" name="nuevaPassword" required placeholder="Mínimo 4 caracteres" minlength="4">
+        <input type="password" name="nuevaPassword" placeholder="Mínimo 4 caracteres">
       </div>
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalPassword')">Cancelar</button>
-        <button type="submit" class="btn-submit">✓ Cambiar Contraseña</button>
+        <button type="submit" class="btn-submit">Cambiar Contraseña</button>
       </div>
     </form>
   </div>

@@ -32,7 +32,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Veterinaria Bellavista</title>
+    <title>Login - Veterinaria Llano Grande</title>
     <link rel="stylesheet" type="text/css" href="estilos/login.css">
 </head>
 <body>
@@ -41,26 +41,27 @@
 
     <div class="welcome-section">
         <div>
-            <h1>Veterinaria<br>"Bellavista"</h1>
-            <p>Gestión integral para el cuidado de tus mascotas.</p>
+            <h1>Veterinaria<br>"Llano Grande"</h1>
+            <p>Sistema de gestión de citas para tus mascotas.</p>
+            <p style="font-size: 0.95em; margin-top: 10px; opacity: 0.9;">Cuida la salud de tu compañero peludo con nosotros.</p>
         </div>
 
         <div class="rocket-image-placeholder">
-            <div style="font-size: 6rem;">🐾</div>
+            <div style="font-size: 6rem; font-weight: bold; color: #0077be;">VET</div>
         </div>
 
         <p style="font-size: 0.8em; opacity: 0.8;">Tu confianza, nuestro compromiso.</p>
     </div>
 
     <div class="login-container">
-        <h2>USER LOGIN</h2>
+        <h2>LOGIN</h2>
 
         <%
             String errorMessage = (String) request.getAttribute("errorMessage");
             if (errorMessage != null) {
         %>
         <div class="error-message">
-            ⚠️ <%= errorMessage %>
+            <%= errorMessage %>
         </div>
         <% } %>
 
@@ -71,8 +72,7 @@
                         type="text"
                         id="username"
                         name="username"
-                        placeholder="📧 Correo Electrónico"
-                        required
+                        placeholder="Correo Electrónico"
                         autocomplete="username">
             </div>
 
@@ -82,8 +82,7 @@
                         type="password"
                         id="password"
                         name="password"
-                        placeholder="🔒 Contraseña"
-                        required
+                        placeholder="Contraseña"
                         autocomplete="current-password">
             </div>
 
@@ -94,14 +93,6 @@
             <a href="solicitarRecuperacion.jsp">
                 ¿Olvidaste tu contraseña?
             </a>
-        </div>
-
-        <div class="test-users">
-            <p>Usuarios de prueba:</p>
-            <div style="margin-top: 5px;">
-                Admin: <code>admin</code> / <code>12345</code><br>
-                Vet: <code>vet@test.com</code> / <code>12345</code>
-            </div>
         </div>
     </div>
 </div>

@@ -16,7 +16,6 @@
 <body>
 <div class="container">
   <div class="header">
-    <div class="header-icon">🔑</div>
     <h1>Recuperar Contraseña</h1>
     <p>Ingresa tu correo electrónico registrado</p>
   </div>
@@ -24,12 +23,12 @@
   <div class="content">
     <% if (success != null) { %>
     <div class="alert alert-success">
-      <strong>✓ ¡Listo!</strong><br>
+      <strong>¡Listo!</strong><br>
       <%= success %>
     </div>
 
     <div class="steps">
-      <h3>📧 Pasos a seguir:</h3>
+      <h3>Pasos a seguir:</h3>
       <ol>
         <li>Revisa tu bandeja de entrada de <strong><%= correo %></strong></li>
         <li>Busca el correo de "Veterinaria Bellavista"</li>
@@ -41,13 +40,13 @@
 
     <% if (error != null) { %>
     <div class="alert alert-error">
-      <strong>✗ Error:</strong><br>
+      <strong>Error:</strong><br>
       <%= error %>
     </div>
     <% } %>
 
     <div class="info-box">
-      <p><strong>ℹ️ ¿Olvidaste tu contraseña?</strong></p>
+      <p><strong>¿Olvidaste tu contraseña?</strong></p>
       <p>No te preocupes, te enviaremos un enlace a tu correo para restablecerla.</p>
     </div>
 
@@ -55,7 +54,7 @@
       <input type="hidden" name="action" value="solicitar">
 
       <div class="form-group">
-        <label for="correo">📧 Correo Electrónico</label>
+        <label for="correo">Correo Electrónico</label>
         <input
                 type="email"
                 id="correo"
@@ -66,7 +65,7 @@
       </div>
 
       <button type="submit" class="btn-submit">
-        🔐 Enviar Enlace de Recuperación
+        Enviar Enlace de Recuperación
       </button>
     </form>
     <% } %>
@@ -74,7 +73,7 @@
     <div class="footer-links">
       <p>
         ¿Recordaste tu contraseña?
-        <a href="login.jsp">← Volver al Login</a>
+        <a href="login.jsp">Volver al Login</a>
       </p>
     </div>
   </div>

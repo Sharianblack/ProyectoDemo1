@@ -18,7 +18,7 @@
 <body>
 <div class="registro-container">
     <div class="logo">
-        <h1>🐾 Registro</h1>
+        <h1>Registro</h1>
         <p>Veterinaria Bellavista</p>
     </div>
 
@@ -44,7 +44,7 @@
     <% } %>
 
     <div class="info-box">
-        📧 <strong>Importante:</strong> Te enviaremos un correo de verificación.
+        <strong>Importante:</strong> Te enviaremos un correo de verificación.
         Debes confirmar tu email para activar tu cuenta.
     </div>
 
@@ -89,7 +89,7 @@
         </div>
 
         <button type="submit" class="btn-registro">
-            📧 Crear Cuenta
+            Crear Cuenta
         </button>
     </form>
 
@@ -134,12 +134,12 @@
         const confirmar = document.getElementById('confirmarPassword').value;
 
         if (password !== confirmar) {
-            alert('❌ Las contraseñas no coinciden');
+            alert('Las contraseñas no coinciden');
             return false;
         }
 
         if (password.length < 4) {
-            alert('❌ La contraseña debe tener al menos 4 caracteres');
+            alert('La contraseña debe tener al menos 4 caracteres');
             return false;
         }
 

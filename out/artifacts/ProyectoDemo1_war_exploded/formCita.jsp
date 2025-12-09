@@ -56,10 +56,10 @@
 </head>
 <body>
 <nav class="navbar">
-    <h1><%= esEditar ? "✏️ Editar Cita" : "➕ Nueva Cita" %></h1>
+    <h1><%= esEditar ? "Editar Cita" : "Nueva Cita" %></h1>
     <div class="user-info">
         <span>Dr./Dra. <strong><%= nombreUsuario %></strong></span>
-        <a href="CitaServlet?action=listar" class="btn-volver">← Volver a Mis Citas</a>
+        <a href="CitaServlet?action=listar" class="btn-volver">Volver a Mis Citas</a>
     </div>
 </nav>
 
@@ -72,18 +72,18 @@
             </p>
         </div>
 
-        <form action="CitaServlet" method="post" onsubmit="return validarFormulario()">
+        <form action="CitaServlet" method="post">
             <input type="hidden" name="action" value="<%= esEditar ? "actualizar" : "crear" %>">
             <% if (esEditar && cita != null) { %>
             <input type="hidden" name="idCita" value="<%= cita.getIdCita() %>">
             <% } %>
 
             <div class="form-section">
-                <h3>📋 Información del Cliente</h3>
+                <h3>Información del Cliente</h3>
 
                 <div class="form-group">
                     <label for="idCliente">Cliente <span class="required">*</span></label>
-                    <select name="idCliente" id="idCliente" required onchange="cargarMascotas()">
+                    <select name="idCliente" id="idCliente" onchange="cargarMascotas()">
                         <option value="">Selecciona un cliente...</option>
                         <% if (clientes != null) {
                             for (String[] cliente : clientes) {
@@ -107,14 +107,14 @@
 
                 <div class="form-group" id="mascotasContainer">
                     <label for="idMascota">Mascota <span class="required">*</span></label>
-                    <select name="idMascota" id="idMascota" required>
+                    <select name="idMascota" id="idMascota">
                         <option value="">Primero selecciona un cliente</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-section">
-                <h3>📅 Fecha y Hora de la Cita</h3>
+                <h3>Fecha y Hora de la Cita</h3>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -122,9 +122,7 @@
                         <input type="date"
                                name="fecha"
                                id="fecha"
-                               value="<%= esEditar ? fechaFormateada : "" %>"
-                               min="<%= new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>"
-                               required>
+                               value="<%= esEditar ? fechaFormateada : "" %>">
                     </div>
 
                     <div class="form-group">
@@ -132,18 +130,17 @@
                         <input type="time"
                                name="hora"
                                id="hora"
-                               value="<%= esEditar ? horaFormateada : "" %>"
-                               required>
+                               value="<%= esEditar ? horaFormateada : "" %>">
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h3>🏥 Ubicación</h3>
+                <h3>Ubicación</h3>
 
                 <div class="form-group">
                     <label for="idSucursal">Sucursal <span class="required">*</span></label>
-                    <select name="idSucursal" id="idSucursal" required>
+                    <select name="idSucursal" id="idSucursal">
                         <option value="">Selecciona una sucursal...</option>
                         <% if (sucursales != null) {
                             for (String[] sucursal : sucursales) {
@@ -160,22 +157,22 @@
 
             <% if (esEditar) { %>
             <div class="form-section">
-                <h3>📊 Estado de la Cita</h3>
+                <h3>Estado de la Cita</h3>
 
                 <div class="form-group">
                     <label for="estado">Estado <span class="required">*</span></label>
-                    <select name="estado" id="estado" required>
-                        <option value="Programada" <%= "Programada".equals(cita.getEstado()) ? "selected" : "" %>>📅 Programada</option>
-                        <option value="En Proceso" <%= "En Proceso".equals(cita.getEstado()) ? "selected" : "" %>>⏳ En Proceso</option>
-                        <option value="Completada" <%= "Completada".equals(cita.getEstado()) ? "selected" : "" %>>✓ Completada</option>
-                        <option value="Cancelada" <%= "Cancelada".equals(cita.getEstado()) ? "selected" : "" %>>✗ Cancelada</option>
+                    <select name="estado" id="estado">
+                        <option value="Programada" <%= "Programada".equals(cita.getEstado()) ? "selected" : "" %>>Programada</option>
+                        <option value="En Proceso" <%= "En Proceso".equals(cita.getEstado()) ? "selected" : "" %>>En Proceso</option>
+                        <option value="Completada" <%= "Completada".equals(cita.getEstado()) ? "selected" : "" %>>Completada</option>
+                        <option value="Cancelada" <= "Cancelada".equals(cita.getEstado()) ? "selected" : "" %>>Cancelada</option>
                     </select>
                 </div>
             </div>
             <% } %>
 
             <div class="form-section">
-                <h3>📝 Observaciones</h3>
+                <h3>Observaciones</h3>
 
                 <div class="form-group">
                     <label for="observaciones">Notas adicionales</label>
@@ -187,13 +184,13 @@
             </div>
 
             <div class="info-box">
-                <p><strong>ℹ️ Recuerda:</strong> Todos los campos marcados con <span style="color: #f5576c;">*</span> son obligatorios</p>
+                <p><strong>Recuerda:</strong> Todos los campos marcados con <span style="color: #f5576c;">*</span> son obligatorios</p>
             </div>
 
             <div class="form-actions">
                 <a href="CitaServlet?action=listar" class="btn-cancel">Cancelar</a>
                 <button type="submit" class="btn-submit">
-                    <%= esEditar ? "💾 Guardar Cambios" : "✓ Crear Cita" %>
+                    <%= esEditar ? "Guardar Cambios" : "Crear Cita" %>
                 </button>
             </div>
         </form>
@@ -243,28 +240,6 @@
                 console.error('Error al cargar mascotas:', error);
                 alert('Error al cargar las mascotas. Intenta de nuevo.');
             });
-    }
-
-    // Validar formulario antes de enviar
-    function validarFormulario() {
-        const fecha = document.getElementById('fecha').value;
-        const hora = document.getElementById('hora').value;
-
-        if (!fecha || !hora) {
-            alert('Por favor, completa la fecha y hora de la cita.');
-            return false;
-        }
-
-        // Validar que la fecha no sea en el pasado
-        const fechaSeleccionada = new Date(fecha + 'T' + hora);
-        const ahora = new Date();
-
-        if (fechaSeleccionada < ahora) {
-            alert('No puedes programar una cita en el pasado. Selecciona una fecha y hora futuras.');
-            return false;
-        }
-
-        return true;
     }
 
     <% if (esEditar && cita != null) { %>
