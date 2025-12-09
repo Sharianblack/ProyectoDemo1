@@ -200,7 +200,10 @@ public class EmailUtil {
      */
     public static boolean enviarCorreoBienvenida(String destinatario, String nombreUsuario,
                                                  String rol, String password, String urlLogin) {
-        String asunto = "¡Bienvenido a Veterinaria Bellavista! 🐾";
+        String asunto = "¡Bienvenido a Veterinaria Llano Grande! 🐾";
+
+        // Crear URL para cambiar contraseña
+        String urlCambioPassword = urlLogin.replace("/login.jsp", "/solicitarRecuperacion.jsp");
 
         String mensaje = "<!DOCTYPE html>" +
                 "<html>" +
@@ -212,7 +215,8 @@ public class EmailUtil {
                 "        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }" +
                 "        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }" +
                 "        .credenciales { background: white; padding: 20px; border-radius: 5px; border-left: 4px solid #667eea; margin: 20px 0; }" +
-                "        .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }" +
+                "        .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 10px 5px; }" +
+                "        .button-secondary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }" +
                 "        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }" +
                 "        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }" +
                 "    </style>" +
@@ -220,7 +224,7 @@ public class EmailUtil {
                 "<body>" +
                 "    <div class='container'>" +
                 "        <div class='header'>" +
-                "            <h1>🐾 Veterinaria Bellavista</h1>" +
+                "            <h1>🐾 Veterinaria Llano Grande</h1>" +
                 "            <p>¡Tu cuenta ha sido creada!</p>" +
                 "        </div>" +
                 "        <div class='content'>" +
@@ -229,31 +233,32 @@ public class EmailUtil {
                 "            <p>A continuación encontrarás tus credenciales de acceso:</p>" +
                 "            <div class='credenciales'>" +
                 "                <p><strong>📧 Correo:</strong> " + destinatario + "</p>" +
-                "                <p><strong>🔑 Contraseña:</strong> " + password + "</p>" +
+                "                <p><strong>🔑 Contraseña temporal:</strong> " + password + "</p>" +
                 "            </div>" +
                 "            <div class='warning'>" +
-                "                <strong>⚠️ Importante:</strong>" +
+                "                <strong>⚠️ Importante - Seguridad de tu cuenta:</strong>" +
                 "                <ul style='margin: 10px 0;'>" +
-                "                    <li>Te recomendamos <strong>cambiar tu contraseña</strong> después del primer inicio de sesión</li>" +
+                "                    <li><strong>Es altamente recomendable cambiar tu contraseña</strong> lo antes posible</li>" +
                 "                    <li>Guarda estas credenciales en un lugar seguro</li>" +
                 "                    <li>No compartas tu contraseña con nadie</li>" +
                 "                </ul>" +
                 "            </div>" +
                 "            <center>" +
                 "                <a href='" + urlLogin + "' class='button'>🔐 Iniciar Sesión</a>" +
+                "                <a href='" + urlCambioPassword + "' class='button button-secondary'>🔑 Cambiar Contraseña</a>" +
                 "            </center>" +
                 "            <p style='margin-top: 30px;'><strong>Ahora puedes:</strong></p>" +
                 "            <ul>" +
                 "                <li>✅ Registrar tus mascotas</li>" +
                 "                <li>✅ Agendar citas veterinarias</li>" +
                 "                <li>✅ Consultar historial clínico</li>" +
-                "                <li>✅ Ver calendario de vacunación</li>" +
+                "                <li>✅ Ver calendario de atención</li>" +
                 "            </ul>" +
-                "            <p style='margin-top: 30px;'>Saludos,<br><strong>Equipo de Veterinaria Bellavista</strong></p>" +
+                "            <p style='margin-top: 30px;'>Saludos,<br><strong>Equipo de Veterinaria Llano Grande</strong></p>" +
                 "        </div>" +
                 "        <div class='footer'>" +
                 "            <p>Este es un correo automático, por favor no responder.</p>" +
-                "            <p>&copy; 2025 Veterinaria Bellavista - Todos los derechos reservados</p>" +
+                "            <p>&copy; 2025 Veterinaria Llano Grande - Todos los derechos reservados</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +

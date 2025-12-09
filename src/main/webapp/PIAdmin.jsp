@@ -41,44 +41,38 @@
 </head>
 <body>
 <nav class="navbar">
-  <h1>🛡️ Panel de Administración</h1>
+  <h1>Panel de Administración</h1>
   <div class="user-info">
     <span>Administrador: <strong><%= nombreUsuario != null ? nombreUsuario : username %></strong></span>
-    <span class="admin-badge">⚡ ADMIN</span>
+    <span class="admin-badge">ADMIN</span>
     <a href="LogoutServlet" class="logout-btn">Cerrar Sesión</a>
   </div>
 </nav>
 
 <div class="content">
   <div class="welcome-card">
-    <h2>🎯 Panel de Control del Administrador</h2>
-    <p>Tienes acceso completo al sistema. Desde aquí puedes gestionar usuarios, sucursales, servicios y más.</p>
-    <p><strong>Tu ID:</strong> <%= userId %> | <strong>Rol:</strong> Administrador</p>
+    <h2>Panel de Control del Administrador</h2>
+    <p style="font-size: 1.1em; margin-bottom: 15px; color: #2c3e50;">
+      Como administrador, tu rol es fundamental para el funcionamiento óptimo del sistema. 
+      Tienes la responsabilidad y el privilegio de gestionar usuarios, supervisar operaciones, 
+      administrar sucursales y mantener la integridad de toda la plataforma.
+    </p>
+    <p style="font-style: italic; color: #7f8c8d; border-left: 4px solid #3498db; padding-left: 15px; margin-top: 20px;">
+      "El liderazgo efectivo no se trata de tomar decisiones por los demás, 
+      sino de crear las condiciones para que todos prosperen."
+    </p>
+    <p style="margin-top: 20px;"><strong>ID de Usuario:</strong> <%= userId %> | <strong>Nivel de Acceso:</strong> Completo</p>
   </div>
 
-  <div class="admin-grid">
-    <div class="admin-card" onclick="location.href='UsuarioServlet?action=listar'">
-      <div class="icon">👥</div>
+  <div class="admin-grid" style="justify-content: center;">
+    <div class="admin-card" onclick="location.href='UsuarioServlet?action=listar'" style="cursor: pointer;">
       <h3>Gestión de Usuarios</h3>
       <p>Crear, editar y eliminar usuarios del sistema</p>
     </div>
 
     <div class="admin-card" onclick="location.href='SucursalServlet?action=listar'" style="cursor: pointer;">
-      <div class="icon">🏥</div>
       <h3>Sucursales</h3>
       <p>Administrar sucursales y sus ubicaciones</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">📊</div>
-      <h3>Estadísticas</h3>
-      <p>Ver métricas y análisis del sistema</p>
-    </div>
-
-    <div class="admin-card">
-      <div class="icon">⚙️</div>
-      <h3>Configuración</h3>
-      <p>Ajustes generales del sistema</p>
     </div>
   </div>
 </div>

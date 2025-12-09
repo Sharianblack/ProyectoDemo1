@@ -42,50 +42,40 @@
 </head>
 <body>
 <nav class="navbar">
-    <h1>🩺 Portal Veterinario</h1>
+    <h1>Portal Veterinario</h1>
     <div class="user-info">
         <span>Dr./Dra. <strong><%= nombreUsuario != null ? nombreUsuario : username %></strong></span>
-        <span class="vet-badge">⚕️ VETERINARIO</span>
+        <span class="vet-badge">VETERINARIO</span>
         <a href="LogoutServlet" class="logout-btn">Cerrar Sesión</a>
     </div>
 </nav>
 
 <div class="content">
     <div class="welcome-card">
-        <h2>👨‍⚕️ Panel de Atención Veterinaria</h2>
+        <h2>Panel de Atención Veterinaria</h2>
         <p>Bienvenido al portal veterinario. Gestiona tus citas, pacientes y registros clínicos.</p>
         <p><strong>Tu ID:</strong> <%= userId %> | <strong>Rol:</strong> Veterinario</p>
     </div>
 
     <div class="vet-grid">
         <div class="vet-card" onclick="location.href='CitaServlet?action=listar'">
-            <div class="icon">📅</div>
             <h3>Mis Citas</h3>
             <p>Ver y gestionar citas asignadas</p>
         </div>
 
         <div class="vet-card" onclick="location.href='VeterinarioClienteServlet?action=listar'" style="cursor: pointer;">
-            <div class="icon">👥</div>
             <h3>Gestión de Clientes</h3>
             <p>Registrar y gestionar clientes</p>
         </div>
 
         <div class="vet-card" onclick="location.href='PacienteServlet?action=listar'" style="cursor: pointer;">
-            <div class="icon">🐕</div>
             <h3>Pacientes</h3>
             <p>Consultar información de mascotas</p>
         </div>
 
         <div class="vet-card" onclick="location.href='HistorialClinicoServlet?action=listar'" style="cursor: pointer;">
-            <div class="icon">📋</div>
             <h3>Historial Clínico</h3>
             <p>Registrar diagnósticos y tratamientos</p>
-        </div>
-
-        <div class="vet-card">
-            <div class="icon">⚙️</div>
-            <h3>Mi Perfil</h3>
-            <p>Actualizar información personal</p>
         </div>
     </div>
 </div>

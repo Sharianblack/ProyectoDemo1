@@ -145,7 +145,7 @@ public class UsuarioServlet extends HttpServlet {
             // Obtener datos del formulario
             String nombre = request.getParameter("nombre");
             String correo = request.getParameter("correo");
-            String password = request.getParameter("password");
+            // Ya no se pide la contraseña, se genera automáticamente
             String rol = request.getParameter("rol");
             String telefono = request.getParameter("telefono");
             String direccion = request.getParameter("direccion");
@@ -183,21 +183,36 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
-            if (!ValidacionUtil.esPasswordValido(password)) {
-                request.setAttribute("error", "La contraseña debe tener al menos 6 caracteres");
-                listarUsuarios(request, response);
-                return;
-            }
-
+            // Ya no validamos la contraseña porque se genera automáticamente
+            
             if (!ValidacionUtil.esRolValido(rol)) {
                 request.setAttribute("error", "Rol inválido. Debe ser: Admin, Veterinario o Cliente");
                 listarUsuarios(request, response);
                 return;
             }
 
-            // Validar teléfono si se proporciona
-            if (ValidacionUtil.noEstaVacio(telefono) && !ValidacionUtil.esTelefonoValido(telefono)) {
+            // Validar teléfono (ahora es obligatorio)
+            if (!ValidacionUtil.noEstaVacio(telefono)) {
+                request.setAttribute("error", "El teléfono es obligatorio");
+                listarUsuarios(request, response);
+                return;
+            }
+            
+            if (!ValidacionUtil.esTelefonoValido(telefono)) {
                 request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validar dirección (ahora es obligatoria)
+            if (!ValidacionUtil.noEstaVacio(direccion)) {
+                request.setAttribute("error", "La dirección es obligatoria");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esTextoValido(direccion, 5, 200)) {
+                request.setAttribute("error", "La dirección debe tener entre 5 y 200 caracteres");
                 listarUsuarios(request, response);
                 return;
             }
@@ -240,11 +255,15 @@ public class UsuarioServlet extends HttpServlet {
             String nombreSanitizado = ValidacionUtil.sanitizar(nombre.trim());
             String direccionSanitizada = ValidacionUtil.sanitizar(direccion != null ? direccion.trim() : "");
 
+            // Generar contraseña segura automáticamente
+            String passwordGenerada = util.PasswordUtil.generarPasswordSegura(16);
+            System.out.println("🔐 Contraseña segura generada para: " + correo);
+
             // Crear usuario
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setNombre(nombreSanitizado);
             nuevoUsuario.setCorreo(correo);
-            nuevoUsuario.setPasswordHash(password);
+            nuevoUsuario.setPasswordHash(passwordGenerada);
             nuevoUsuario.setRol(rol);
             nuevoUsuario.setTelefono(telefono != null ? telefono.trim() : "");
             nuevoUsuario.setDireccion(direccionSanitizada);
@@ -272,19 +291,19 @@ public class UsuarioServlet extends HttpServlet {
                             correo,
                             nombre.trim(),
                             rol,
-                            password,
+                            passwordGenerada,  // Usar la contraseña generada
                             urlLogin
                     );
 
                     if (correoEnviado) {
                         request.setAttribute("success",
-                                "✅ Usuario '" + nombre + "' (" + rol + ") creado exitosamente. " +
-                                        "📧 Se ha enviado un correo de bienvenida a " + correo);
+                                "Usuario '" + nombre + "' (" + rol + ") creado exitosamente. " +
+                                        "Se ha enviado un correo con la contraseña segura a " + correo);
                         System.out.println("✅ Correo de bienvenida enviado a: " + correo);
                     } else {
                         request.setAttribute("success",
-                                "✅ Usuario '" + nombre + "' creado exitosamente. " +
-                                        "⚠️ No se pudo enviar el correo de bienvenida.");
+                                "Usuario '" + nombre + "' creado exitosamente. " +
+                                        "No se pudo enviar el correo de bienvenida.");
                         System.out.println("❌ Error al enviar correo de bienvenida a: " + correo);
                     }
                 } catch (Exception emailEx) {
@@ -360,13 +379,30 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
-            // Validación de teléfono (si se proporciona)
-            if (telefono != null && !telefono.trim().isEmpty()) {
-                if (!util.ValidacionUtil.esTelefonoValido(telefono)) {
-                    request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
-                    listarUsuarios(request, response);
-                    return;
-                }
+            // Validación de teléfono (ahora es obligatorio)
+            if (!ValidacionUtil.noEstaVacio(telefono)) {
+                request.setAttribute("error", "El teléfono es obligatorio");
+                listarUsuarios(request, response);
+                return;
+            }
+            
+            if (!util.ValidacionUtil.esTelefonoValido(telefono)) {
+                request.setAttribute("error", "El teléfono debe tener exactamente 10 dígitos");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            // Validación de dirección (ahora es obligatoria)
+            if (!ValidacionUtil.noEstaVacio(direccion)) {
+                request.setAttribute("error", "La dirección es obligatoria");
+                listarUsuarios(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esTextoValido(direccion, 5, 200)) {
+                request.setAttribute("error", "La dirección debe tener entre 5 y 200 caracteres");
+                listarUsuarios(request, response);
+                return;
             }
 
             // Validación de rol
@@ -389,8 +425,8 @@ public class UsuarioServlet extends HttpServlet {
             usuario.setNombre(nombre.trim());
             usuario.setCorreo(correo.trim().toLowerCase());
             usuario.setRol(rol);
-            usuario.setTelefono(telefono != null ? telefono.trim() : "");
-            usuario.setDireccion(direccion != null ? direccion.trim() : "");
+            usuario.setTelefono(telefono.trim());
+            usuario.setDireccion(direccion.trim());
             usuario.setActivo(activo);
 
             boolean actualizado = usuarioDao.actualizarUsuario(usuario);

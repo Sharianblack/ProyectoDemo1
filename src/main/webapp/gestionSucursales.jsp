@@ -53,11 +53,11 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <h1>🏥 Gestión de Sucursales</h1>
+  <h1>Gestión de Sucursales</h1>
   <div class="user-info">
     <span>Administrador: <strong><%= nombreUsuario %></strong></span>
-    <span class="admin-badge">⚡ ADMIN</span>
-    <a href="PIAdmin.jsp" class="btn-volver">← Volver al Panel</a>
+    <span class="admin-badge">ADMIN</span>
+    <a href="PIAdmin.jsp" class="btn-volver">Volver al Panel</a>
   </div>
 </nav>
 
@@ -66,8 +66,8 @@
 
   <!-- HEADER CON BOTÓN NUEVO -->
   <div class="page-header">
-    <h2>📍 Administración de Sucursales</h2>
-    <button class="btn-nuevo" onclick="abrirModal('modalCrear')">➕ Nueva Sucursal</button>
+    <h2>Administración de Sucursales</h2>
+    <button class="btn-nuevo" onclick="abrirModal('modalCrear')">Nueva Sucursal</button>
   </div>
 
   <!-- BARRA DE BÚSQUEDA -->
@@ -77,7 +77,7 @@
       <input
               type="text"
               name="criterio"
-              placeholder="🔍 Buscar por nombre, ciudad o dirección..."
+              placeholder="Buscar por nombre, ciudad o dirección..."
               value="<%= request.getAttribute("criterio") != null ? request.getAttribute("criterio") : "" %>">
       <button type="submit" class="btn-buscar">Buscar</button>
       <% if (request.getAttribute("criterio") != null && !request.getAttribute("criterio").toString().isEmpty()) { %>
@@ -120,7 +120,7 @@
         if (sucursales != null && !sucursales.isEmpty()) {
           for (Sucursal s : sucursales) {
             String estadoClase = s.isActivo() ? "badge-activo" : "badge-inactivo";
-            String estadoTexto = s.isActivo() ? "✓ Activa" : "✗ Inactiva";
+            String estadoTexto = s.isActivo() ? "Activa" : "Inactiva";
             String horarioTexto = "";
             if (s.getHorarioApertura() != null && s.getHorarioCierre() != null) {
               horarioTexto = timeFormat.format(s.getHorarioApertura()) + " - " + timeFormat.format(s.getHorarioCierre());
@@ -141,7 +141,7 @@
         <td><%= s.getCorreo() != null && !s.getCorreo().isEmpty() ? s.getCorreo() : "N/A" %></td>
         <td>
           <% if (!horarioTexto.isEmpty()) { %>
-          <span class="horario-badge">🕒 <%= horarioTexto %></span>
+          <span class="horario-badge"><%= horarioTexto %></span>
           <% } else { %>
           N/A
           <% } %>
@@ -157,21 +157,21 @@
                   '<%= s.getCiudad() != null ? s.getCiudad() : "" %>', 
                   '<%= s.getHorarioApertura() != null ? timeFormat.format(s.getHorarioApertura()) : "" %>', 
                   '<%= s.getHorarioCierre() != null ? timeFormat.format(s.getHorarioCierre()) : "" %>', 
-                  <%= s.isActivo() %>)">✏️ Editar</button>
+                  <%= s.isActivo() %>)'>Editar</button>
 
           <button class="btn-action btn-delete" 
-                  onclick="eliminarSucursal(<%= s.getId() %>, '<%= s.getNombre() %>')">🗑️ Eliminar</button>
+                  onclick="eliminarSucursal(<%= s.getId() %>, '<%= s.getNombre() %>')">Eliminar</button>
 
           <%
             if (s.isActivo()) {
           %>
-          <button class="btn-action btn-disable" 
-                  onclick="cambiarEstado(<%= s.getId() %>, false, '<%= s.getNombre() %>')">⏸️ Desactivar</button>
+          <button class="btn-action btn-toggle" 
+                  onclick="cambiarEstado(<%= s.getId() %>, false, '<%= s.getNombre() %>')">Desactivar</button>
           <%
           } else {
           %>
-          <button class="btn-action btn-enable" 
-                  onclick="cambiarEstado(<%= s.getId() %>, true, '<%= s.getNombre() %>')">▶️ Activar</button>
+          <button class="btn-action btn-activate" 
+                  onclick="cambiarEstado(<%= s.getId() %>, true, '<%= s.getNombre() %>')">Activar</button>
           <%
             }
           %>
@@ -197,7 +197,7 @@
 <div id="modalCrear" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>➕ Nueva Sucursal</h3>
+      <h3>Nueva Sucursal</h3>
       <span class="close" onclick="cerrarModal('modalCrear')">&times;</span>
     </div>
 
@@ -259,7 +259,7 @@
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalCrear')">Cancelar</button>
-        <button type="submit" class="btn-submit">✓ Crear Sucursal</button>
+        <button type="submit" class="btn-submit">Crear Sucursal</button>
       </div>
     </form>
   </div>
@@ -269,7 +269,7 @@
 <div id="modalEditar" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>✏️ Editar Sucursal</h3>
+      <h3>Editar Sucursal</h3>
       <span class="close" onclick="cerrarModal('modalEditar')">&times;</span>
     </div>
 
@@ -332,7 +332,7 @@
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalEditar')">Cancelar</button>
-        <button type="submit" class="btn-submit">✓ Guardar Cambios</button>
+        <button type="submit" class="btn-submit">Guardar Cambios</button>
       </div>
     </form>
   </div>

@@ -53,14 +53,14 @@
 </head>
 <body>
 <nav class="navbar">
-    <h1>📅 Mis Citas</h1>
+    <h1>Mis Citas</h1>
     <div class="user-info">
         <span><strong><%= nombreUsuario %></strong></span>
         <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
-            <span class="vet-badge">⚕️ VETERINARIO</span>
+            <span class="vet-badge">VETERINARIO</span>
             <a href="PIVeterinario.jsp" class="btn-volver">← Volver al Panel</a>
         <% } else { %>
-            <span class="client-badge">👤 CLIENTE</span>
+            <span class="client-badge">CLIENTE</span>
             <a href="paginaInicio.jsp" class="btn-volver">← Volver al Panel</a>
         <% } %>
     </div>
@@ -70,12 +70,12 @@
     <div class="page-header">
         <div class="header-content">
             <div>
-                <h2>📋 Gestión de Citas Veterinarias</h2>
+                <h2>Gestión de Citas Veterinarias</h2>
                 <p style="color: #666; margin-top: 0.5rem;">Administra tus citas, actualiza estados y añade observaciones</p>
             </div>
             <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
             <a href="CitaServlet?action=formCrear" class="btn-nueva-cita">
-                ➕ Nueva Cita
+                + Nueva Cita
             </a>
             <% } %>
         </div>
@@ -85,51 +85,32 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number stat-programada"><%= programadas %></div>
-            <div class="stat-label">📅 Programadas</div>
+            <div class="stat-label">Programadas</div>
         </div>
         <div class="stat-card">
             <div class="stat-number stat-proceso"><%= enProceso %></div>
-            <div class="stat-label">⏳ En Proceso</div>
+            <div class="stat-label">En Proceso</div>
         </div>
         <div class="stat-card">
             <div class="stat-number stat-completada"><%= completadas %></div>
-            <div class="stat-label">✓ Completadas</div>
+            <div class="stat-label">Completadas</div>
         </div>
         <div class="stat-card">
             <div class="stat-number stat-cancelada"><%= canceladas %></div>
-            <div class="stat-label">✗ Canceladas</div>
+            <div class="stat-label">Canceladas</div>
         </div>
     </div>
     <% } %>
 
-    <div class="filter-bar">
-        <strong>Filtrar por:</strong>
-        <a href="CitaServlet?action=listar" class="filter-btn <%= filtro == null ? "active" : "" %>">
-            📋 Todas (<%= totalCitas != null ? totalCitas : 0 %>)
-        </a>
-        <a href="CitaServlet?action=hoy" class="filter-btn <%= "hoy".equals(filtro) ? "active" : "" %>">
-            📆 Hoy
-        </a>
-        <a href="CitaServlet?action=filtrar&estado=Programada" class="filter-btn <%= "Programada".equals(filtro) ? "active" : "" %>">
-            📅 Programadas
-        </a>
-        <a href="CitaServlet?action=filtrar&estado=En Proceso" class="filter-btn <%= "En Proceso".equals(filtro) ? "active" : "" %>">
-            ⏳ En Proceso
-        </a>
-        <a href="CitaServlet?action=filtrar&estado=Completada" class="filter-btn <%= "Completada".equals(filtro) ? "active" : "" %>">
-            ✓ Completadas
-        </a>
-    </div>
-
     <% if (success != null) { %>
     <div class="alert alert-success">
-        ✓ <%= success %>
+        <%= success %>
     </div>
     <% } %>
 
     <% if (error != null) { %>
     <div class="alert alert-error">
-        ✗ <%= error %>
+        <%= error %>
     </div>
     <% } %>
 
@@ -154,7 +135,7 @@
                     <strong><%= c.getFechaSola() %></strong><br>
                     <span style="color: #666;"><%= c.getHora() %></span>
                     <% if (c.esHoy()) { %>
-                    <br><span style="color: #f5576c; font-weight: bold;">🔥 HOY</span>
+                    <br><span style="color: #f5576c; font-weight: bold;">HOY</span>
                     <% } %>
                 </td>
                 <td>
@@ -174,28 +155,28 @@
                         <% if (!"Completada".equals(c.getEstado()) && !"Cancelada".equals(c.getEstado())) { %>
                         <button class="btn-action btn-proceso"
                                 onclick="cambiarEstado(<%= c.getIdCita() %>, &quot;En Proceso&quot;)">
-                            ⏳ En Proceso
+                            En Proceso
                         </button>
                         <button class="btn-action btn-completar"
                                 onclick="cambiarEstado(<%= c.getIdCita() %>, &quot;Completada&quot;)">
-                            ✓ Completar
+                            Completar
                         </button>
                         <% } %>
                         <a href="CitaServlet?action=formEditar&id=<%= c.getIdCita() %>"
                            class="btn-action btn-editar-yellow">
-                            ✏️ Editar
+                            Editar
                         </a>
                         <%
                           String obsVal = c.getObservaciones() != null ? c.getObservaciones().replace("'", "\\'").replace("\n", "\\n").replace("\r", "") : "";
                         %>
                         <button class="btn-action btn-observar"
                                 onclick="abrirModalObservaciones(<%= c.getIdCita() %>, '<%= obsVal %>')">
-                            📝 Observaciones
+                            Observaciones
                         </button>
                         <% if ("Programada".equals(c.getEstado())) { %>
                         <button class="btn-action btn-cancelar"
                                 onclick="if(confirm(&quot;¿Estás seguro de eliminar esta cita?&quot;)) window.location.href=&quot;CitaServlet?action=eliminar&amp;id=<%= c.getIdCita() %>&quot;">
-                            🗑️ Eliminar
+                            Eliminar
                         </button>
                         <% } %>
                     </div>
@@ -207,7 +188,7 @@
         </table>
         <% } else { %>
         <div class="empty-state">
-            <div class="empty-icon">📭</div>
+            <div class="empty-icon">·</div>
             <h3>No hay citas registradas</h3>
             <p>No tienes citas <%= filtro != null ? "con el filtro seleccionado" : "en este momento" %></p>
         </div>
@@ -220,49 +201,49 @@
         <div class="cita-card">
             <div class="cita-header">
                 <div class="cita-fecha">
-                    📅 <%= c.getFechaFormateada() %>
+                    <%= c.getFechaFormateada() %>
                     <% if (c.esHoy()) { %>
-                    <br><span style="color: #f5576c;">🔥 HOY</span>
+                    <br><span style="color: #f5576c;">HOY</span>
                     <% } %>
                 </div>
                 <%= c.getEstadoBadge() %>
             </div>
             <div class="cita-info">
-                <strong>🐕 Mascota:</strong> <%= c.getNombreMascota() %> (<%= c.getEspecieMascota() %>)
+                <strong>Mascota:</strong> <%= c.getNombreMascota() %> (<%= c.getEspecieMascota() %>)
             </div>
             <div class="cita-info">
-                <strong>👤 Cliente:</strong> <%= c.getNombreCliente() %>
+                <strong>Cliente:</strong> <%= c.getNombreCliente() %>
             </div>
             <div class="cita-info">
-                <strong>📞 Teléfono:</strong> <%= c.getTelefonoCliente() != null ? c.getTelefonoCliente() : "-" %>
+                <strong>Teléfono:</strong> <%= c.getTelefonoCliente() != null ? c.getTelefonoCliente() : "-" %>
             </div>
             <div class="cita-info">
-                <strong>🏥 Sucursal:</strong> <%= c.getNombreSucursal() %>
+                <strong>Sucursal:</strong> <%= c.getNombreSucursal() %>
             </div>
             <% if ("Veterinario".equalsIgnoreCase(rol)) { %>
             <div class="action-buttons">
                 <% if (!"Completada".equals(c.getEstado()) && !"Cancelada".equals(c.getEstado())) { %>
                 <button class="btn-action btn-proceso"
                         onclick="cambiarEstado(<%= c.getIdCita() %>, 'En Proceso')">
-                    ⏳ En Proceso
+                    En Proceso
                 </button>
                 <button class="btn-action btn-completar"
                         onclick="cambiarEstado(<%= c.getIdCita() %>, 'Completada')">
-                    ✓ Completar
+                    Completar
                 </button>
                 <% } %>
                 <a href="CitaServlet?action=formEditar&id=<%= c.getIdCita() %>"
                    class="btn-action btn-editar-yellow">
-                    ✏️ Editar
+                    Editar
                 </a>
                 <button class="btn-action btn-observar"
                         onclick="abrirModalObservaciones(<%= c.getIdCita() %>, '<%= c.getObservaciones() != null ? c.getObservaciones().replace("'", "\\'").replace("\n", "\\n") : "" %>')">
-                    📝 Observaciones
+                    Observaciones
                 </button>
                 <% if ("Programada".equals(c.getEstado())) { %>
                 <button class="btn-action btn-cancelar"
                         onclick="eliminarCita(<%= c.getIdCita() %>)">
-                    🗑️ Eliminar
+                    Eliminar
                 </button>
                 <% } %>
             </div>
@@ -276,7 +257,7 @@
 <div id="modalObservaciones" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>📝 Observaciones de la Cita</h3>
+            <h3>Observaciones de la Cita</h3>
             <span class="close" onclick="cerrarModal()">&times;</span>
         </div>
         <form action="CitaServlet" method="post">
@@ -286,7 +267,7 @@
             <textarea name="observaciones" id="txtObservaciones"
                       placeholder="Escribe las observaciones de la cita aquí..."></textarea>
 
-            <button type="submit" class="btn-submit">💾 Guardar Observaciones</button>
+            <button type="submit" class="btn-submit">Guardar Observaciones</button>
         </form>
     </div>
 </div>

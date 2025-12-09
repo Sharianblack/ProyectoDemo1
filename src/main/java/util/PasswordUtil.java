@@ -1,6 +1,7 @@
 package util;
 
 import org.mindrot.jbcrypt.BCrypt;
+import java.security.SecureRandom;
 
 /**
  * Utilidad para encriptar y verificar contraseñas usando BCrypt
@@ -10,6 +11,67 @@ public class PasswordUtil {
     // Factor de trabajo (cost factor)
     // Valor entre 10-12 es recomendado (mayor = más seguro pero más lento)
     private static final int WORK_FACTOR = 12;
+
+    // Caracteres permitidos para generar contraseñas seguras
+    private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+    private static final String NUMBERS = "0123456789";
+    private static final String SPECIAL_CHARS = "!@#$%&*-_+=?";
+    private static final String ALL_CHARS = UPPERCASE + LOWERCASE + NUMBERS + SPECIAL_CHARS;
+
+    // ========================================================================
+    // GENERAR CONTRASEÑA SEGURA
+    // ========================================================================
+    /**
+     * Genera una contraseña segura aleatoria similar a las de Google
+     * Incluye mayúsculas, minúsculas, números y caracteres especiales
+     * @param length Longitud de la contraseña (mínimo 12, recomendado 16)
+     * @return Contraseña segura generada
+     */
+    public static String generarPasswordSegura(int length) {
+        if (length < 12) {
+            length = 12; // Mínimo 12 caracteres para seguridad
+        }
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder password = new StringBuilder(length);
+
+        // Asegurar que tenga al menos un carácter de cada tipo
+        password.append(UPPERCASE.charAt(random.nextInt(UPPERCASE.length())));
+        password.append(LOWERCASE.charAt(random.nextInt(LOWERCASE.length())));
+        password.append(NUMBERS.charAt(random.nextInt(NUMBERS.length())));
+        password.append(SPECIAL_CHARS.charAt(random.nextInt(SPECIAL_CHARS.length())));
+
+        // Completar el resto de la contraseña
+        for (int i = 4; i < length; i++) {
+            password.append(ALL_CHARS.charAt(random.nextInt(ALL_CHARS.length())));
+        }
+
+        // Mezclar los caracteres para que no estén en orden predecible
+        return mezclarCaracteres(password.toString(), random);
+    }
+
+    /**
+     * Genera una contraseña segura con longitud por defecto de 16 caracteres
+     * @return Contraseña segura generada
+     */
+    public static String generarPasswordSegura() {
+        return generarPasswordSegura(16);
+    }
+
+    /**
+     * Mezcla aleatoriamente los caracteres de un string
+     */
+    private static String mezclarCaracteres(String input, SecureRandom random) {
+        char[] chars = input.toCharArray();
+        for (int i = chars.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            char temp = chars[i];
+            chars[i] = chars[j];
+            chars[j] = temp;
+        }
+        return new String(chars);
+    }
 
     // ========================================================================
     // ENCRIPTAR CONTRASEÑA

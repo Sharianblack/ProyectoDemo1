@@ -11,7 +11,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #003b5c 0%, #0077be 100%);
     min-height: 100vh;
 }
 
@@ -26,7 +26,7 @@ body {
 }
 
 .navbar h1 {
-    color: #38f9d7;
+    color: #003b5c;
     font-size: 1.5rem;
 }
 
@@ -37,8 +37,17 @@ body {
 }
 
 .vet-badge {
-    background-color: #38f9d7;
-    color: #333;
+    background-color: #0077be;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.client-badge {
+    background-color: #e67e22;
+    color: white;
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -46,16 +55,18 @@ body {
 }
 
 .btn-volver {
-    background-color: #667eea;
+    background-color: #0077be;
     color: white;
     padding: 0.5rem 1rem;
     text-decoration: none;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
 }
 
 .btn-volver:hover {
-    background-color: #5568d3;
+    background-color: #005a8c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 119, 190, 0.3);
 }
 
 /* CONTENEDOR */
@@ -75,7 +86,7 @@ body {
 }
 
 .page-header h2 {
-    color: #38f9d7;
+    color: #003b5c;
 }
 
 .header-content {
@@ -88,7 +99,7 @@ body {
 
 /* Botón Nueva Cita (Extraído del HTML) */
 .btn-nueva-cita {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     color: white;
     padding: 0.75rem 1.5rem;
     text-decoration: none;
@@ -100,7 +111,7 @@ body {
 
 .btn-nueva-cita:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(56, 249, 215, 0.4);
+    box-shadow: 0 4px 10px rgba(230, 126, 34, 0.4);
 }
 
 /* ESTADÍSTICAS */
@@ -150,9 +161,9 @@ body {
 
 .filter-btn {
     padding: 0.5rem 1rem;
-    border: 2px solid #38f9d7;
+    border: 2px solid #0077be;
     background: white;
-    color: #38f9d7;
+    color: #0077be;
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
@@ -162,7 +173,7 @@ body {
 }
 
 .filter-btn:hover, .filter-btn.active {
-    background: #38f9d7;
+    background: #0077be;
     color: white;
 }
 
@@ -211,7 +222,7 @@ table {
 }
 
 thead {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #003b5c 0%, #0077be 100%);
     color: white;
 }
 
@@ -264,7 +275,7 @@ td {
 
 .cita-fecha {
     font-weight: bold;
-    color: #38f9d7;
+    color: #0077be;
 }
 
 .cita-info {
@@ -351,7 +362,7 @@ td {
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #38f9d7;
+    border-bottom: 2px solid #0077be;
 }
 
 .close {
@@ -362,7 +373,7 @@ td {
 }
 
 .close:hover {
-    color: #38f9d7;
+    color: #e67e22;
 }
 
 textarea {
@@ -378,13 +389,19 @@ textarea {
 .btn-submit {
     width: 100%;
     padding: 0.75rem;
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     color: white;
     border: none;
     border-radius: 5px;
     font-weight: 600;
     cursor: pointer;
     margin-top: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(230, 126, 34, 0.4);
 }
 
 /* ESTADO VACÍO */

@@ -3,19 +3,851 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido - Proyecto Veterinaria</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="estilos/index.css">
+    <title>Veterinaria Llano Grande - Cuidado y Salud para tus Mascotas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: #003b5c;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .top-bar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #003b5c;
+        }
+
+        .logo span {
+            color: #e67e22;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            color: #e67e22;
+        }
+
+        /* Hero Slider */
+        .hero-slider {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide1 {
+            background: linear-gradient(rgba(0,59,92,0.7), rgba(0,59,92,0.7)),
+            url('https://images.unsplash.com/photo-1530041539828-114de669390e?w=1600') center/cover;
+        }
+
+        .slide2 {
+            background: linear-gradient(rgba(230,126,34,0.7), rgba(230,126,34,0.7)),
+            url('https://images.unsplash.com/photo-1581888227599-779811939961?w=1600') center/cover;
+        }
+
+        .slide3 {
+            background: linear-gradient(rgba(0,59,92,0.7), rgba(0,59,92,0.7)),
+            url('https://images.unsplash.com/photo-1548681528-6a5c45b66b42?w=1600') center/cover;
+        }
+
+        .slide-content {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .slide-content h6 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .slide-content h1 {
+            font-size: 56px;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        .btn-primary {
+            background: #e67e22;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #d35400;
+            transform: translateY(-3px);
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+
+        .welcome-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .welcome-video {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .welcome-video img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .welcome-content h6 {
+            color: #e67e22;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .welcome-content h2 {
+            font-size: 42px;
+            color: #003b5c;
+            margin-bottom: 25px;
+            line-height: 1.3;
+        }
+
+        .welcome-content p {
+            font-size: 17px;
+            color: #555;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .phone-number {
+            font-size: 32px;
+            color: #003b5c;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 80px 20px;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h6 {
+            color: #e67e22;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-header h2 {
+            font-size: 42px;
+            color: #003b5c;
+        }
+
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .service-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .service-content {
+            padding: 25px;
+        }
+
+        .service-content h6 {
+            color: #e67e22;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .service-content h3 {
+            color: #003b5c;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .service-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .service-content li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .service-content li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        /* Team Section */
+        .team-section {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+
+        .team-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .team-card {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .team-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 5px solid #e67e22;
+        }
+
+        .team-card h5 {
+            color: #003b5c;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .team-card p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #003b5c 0%, #005a8c 100%);
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h6 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cta-section h2 {
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 60px 20px 20px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: #e67e22;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .footer-section p, .footer-section li {
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #e67e22;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            color: #888;
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #003b5c;
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .logo {
+                font-size: 26px;
+            }
+
+            .slide-content h1 {
+                font-size: 42px;
+            }
+
+            .welcome-content h2,
+            .section-header h2 {
+                font-size: 36px;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar .container {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+                font-size: 12px;
+            }
+
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                gap: 0;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-in-out;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                max-height: 400px;
+            }
+
+            .nav-links li {
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+
+            .hero-slider {
+                height: 400px;
+            }
+
+            .slide-content h6 {
+                font-size: 14px;
+            }
+
+            .slide-content h1 {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .btn-primary {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            .welcome-section {
+                padding: 50px 20px;
+            }
+
+            .welcome-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .welcome-content h2 {
+                font-size: 28px;
+            }
+
+            .welcome-content p {
+                font-size: 15px;
+                text-align: left;
+            }
+
+            .phone-number {
+                font-size: 24px;
+                margin-top: 20px;
+            }
+
+            .services-section,
+            .team-section {
+                padding: 50px 20px;
+            }
+
+            .section-header h2 {
+                font-size: 28px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .cta-section {
+                padding: 50px 20px;
+            }
+
+            .cta-section h2 {
+                font-size: 32px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 18px;
+            }
+
+            .hero-slider {
+                height: 350px;
+            }
+
+            .slide-content h1 {
+                font-size: 24px;
+            }
+
+            .slide-content h6 {
+                font-size: 12px;
+            }
+
+            .btn-primary {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+
+            .welcome-content h2,
+            .section-header h2 {
+                font-size: 24px;
+            }
+
+            .cta-section h2 {
+                font-size: 26px;
+            }
+
+            .phone-number {
+                font-size: 20px;
+            }
+
+            .service-image {
+                height: 200px;
+            }
+
+            .team-image {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Botón de Login en la esquina superior derecha -->
-    <a href="login.jsp" class="login-btn">
-        <i class="fas fa-sign-in-alt"></i> Login
-    </a>
-
+<!-- Top Bar -->
+<div class="top-bar">
     <div class="container">
-        <!-- Sección con imagen de fondo -->
-        <div class="background-section"></div>
+        <div>📞 Contáctanos: (+593) 02 3456 789 / 099 316 9347</div>
+        <div>📍 Visítanos: Av. Llano Grande 123, Quito</div>
     </div>
+</div>
+
+<!-- Header -->
+<header>
+    <nav>
+        <div class="logo">Veterinaria <span>Llano Grande</span></div>
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#servicios">Servicios</a></li>
+            <li><a href="#equipo">Equipo</a></li>
+            <li><a href="#contacto">Contáctanos</a></li>
+            <li><a href="login.jsp">Iniciar Sesión</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Hero Slider -->
+<section class="hero-slider">
+    <div class="slide slide1 active">
+        <div class="slide-content">
+            <h6>Veterinaria Llano Grande</h6>
+            <h1>Cuidamos la salud y bienestar de tu mascota</h1>
+            <a href="#contacto" class="btn-primary">Agenda una Cita</a>
+        </div>
+    </div>
+    <div class="slide slide2">
+        <div class="slide-content">
+            <h6>Atención de Calidad</h6>
+            <h1>Equipamiento moderno y profesionales expertos</h1>
+            <a href="#nosotros" class="btn-primary">Conoce Más</a>
+        </div>
+    </div>
+    <div class="slide slide3">
+        <div class="slide-content">
+            <h6>Emergencias 24/7</h6>
+            <h1>Siempre disponibles cuando más nos necesitas</h1>
+            <a href="#servicios" class="btn-primary">Ver Servicios</a>
+        </div>
+    </div>
+</section>
+
+<!-- Welcome Section -->
+<section class="welcome-section" id="nosotros">
+    <div class="welcome-container">
+        <div class="welcome-video">
+            <img src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=800" alt="Veterinaria Llano Grande">
+        </div>
+        <div class="welcome-content">
+            <h6>Bienvenidos a</h6>
+            <h2>Veterinaria Llano Grande</h2>
+            <p>
+                Somos una clínica veterinaria dedicada al cuidado integral de tu mascota.
+                Ofrecemos servicios de medicina preventiva, diagnóstico y tratamiento de enfermedades,
+                cirugía, hospitalización y emergencias las 24 horas del día.
+            </p>
+            <p>
+                Con más de 15 años de experiencia, contamos con médicos veterinarios especializados
+                y tecnología de punta para brindar la mejor atención a perros, gatos y otras mascotas.
+                <strong>Tu mascota es parte de nuestra familia.</strong>
+            </p>
+            <div class="phone-number">📞 099 316 9347</div>
+        </div>
+    </div>
+</section>
+
+<!-- Services/Ventajas Section -->
+<section class="services-section" id="servicios">
+    <div class="section-header">
+        <h6>Todo lo que tu mascota necesita</h6>
+        <h2>Nuestros Servicios Veterinarios</h2>
+    </div>
+    <div class="services-grid">
+        <div class="service-card">
+            <img src="https://images.unsplash.com/photo-1581594549595-35f6edc7b762?w=800" alt="Consultas" class="service-image">
+            <div class="service-content">
+                <h6>Atención Médica</h6>
+                <h3>Consultas y Diagnóstico</h3>
+                <ul>
+                    <li>Consultas médicas generales</li>
+                    <li>Exámenes de laboratorio</li>
+                    <li>Diagnóstico por imágenes</li>
+                    <li>Medicina preventiva</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="service-card">
+            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800" alt="Cirugía" class="service-image">
+            <div class="service-content">
+                <h6>Procedimientos Especializados</h6>
+                <h3>Cirugía y Hospitalización</h3>
+                <ul>
+                    <li>Cirugías de tejidos blandos</li>
+                    <li>Cirugías ortopédicas</li>
+                    <li>Hospitalización 24/7</li>
+                    <li>Cuidados intensivos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section" id="equipo">
+    <div class="section-header">
+        <h6>Conoce a nuestro</h6>
+        <h2>Equipo Veterinario</h2>
+    </div>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto; color: #555; font-size: 18px;">
+        Contamos con médicos veterinarios especializados, con amplia experiencia en el cuidado de mascotas,
+        comprometidos con la salud y bienestar de tus compañeros de vida.
+    </p>
+    <div class="team-grid">
+        <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400" alt="Veterinaria" class="team-image">
+            <h5>MV. Gabriela Arroyo</h5>
+            <p>Directora General</p>
+        </div>
+        <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400" alt="Veterinario" class="team-image">
+            <h5>MV. Christian Giraldo</h5>
+            <p>Cirujano Especialista</p>
+        </div>
+        <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400" alt="Veterinario" class="team-image">
+            <h5>MV. Eduardo Díaz</h5>
+            <p>Medicina Interna</p>
+        </div>
+        <div class="team-card">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400" alt="Veterinaria" class="team-image">
+            <h5>MV. Francisco Cabrera</h5>
+            <p>Diagnóstico por Imágenes</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contacto">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Veterinaria Llano Grande</h3>
+            <p>Comprometidos con la salud y el bienestar de tu mascota. Atención veterinaria de calidad con calidez humana.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Contáctanos</h3>
+            <p>📞 (+593) 02 3456 789</p>
+            <p>📱 099 316 9347</p>
+            <p>✉️ info@vetllanogrande.com</p>
+            <p>📍 Av. Llano Grande 123<br>Quito, Ecuador</p>
+        </div>
+        <div class="footer-section">
+            <h3>Enlaces Rápidos</h3>
+            <ul>
+                <li><a href="#nosotros">Sobre Nosotros</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#equipo">Nuestro Equipo</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Horarios de Atención</h3>
+            <p><strong>Lunes a Viernes:</strong><br>8:00 AM - 8:00 PM</p>
+            <p><strong>Sábados:</strong><br>9:00 AM - 6:00 PM</p>
+            <p><strong>Emergencias:</strong><br>24/7 - Llámanos</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>Copyright © 2024 Veterinaria Llano Grande. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<script>
+    // Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    menuToggle.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+    });
+
+    // Cerrar menú al hacer click en un enlace
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', function() {
+            navLinks.classList.remove('active');
+        });
+    });
+
+    // Slider automático
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+
+    setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, 5000);
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
 </body>
 </html>

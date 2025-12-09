@@ -416,11 +416,19 @@ public class CitaServlet extends HttpServlet {
             }
 
             // Obtener y validar parámetros
+            String idClienteStr = request.getParameter("idCliente");
             String idMascotaStr = request.getParameter("idMascota");
             String idSucursalStr = request.getParameter("idSucursal");
             String fechaStr = request.getParameter("fecha");
             String horaStr = request.getParameter("hora");
             String observaciones = request.getParameter("observaciones");
+
+            // Validar cliente
+            if (!ValidacionUtil.noEstaVacio(idClienteStr)) {
+                request.setAttribute("error", "Debe seleccionar un cliente");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
 
             // Validar que los campos obligatorios no estén vacíos
             if (!ValidacionUtil.noEstaVacio(idMascotaStr)) {
@@ -431,6 +439,18 @@ public class CitaServlet extends HttpServlet {
 
             if (!ValidacionUtil.noEstaVacio(idSucursalStr)) {
                 request.setAttribute("error", "Debe seleccionar una sucursal");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(fechaStr)) {
+                request.setAttribute("error", "La fecha es obligatoria");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.noEstaVacio(horaStr)) {
+                request.setAttribute("error", "La hora es obligatoria");
                 mostrarFormularioCrear(request, response);
                 return;
             }
@@ -463,6 +483,14 @@ public class CitaServlet extends HttpServlet {
             // Combinar fecha y hora
             String fechaHoraStr = fechaStr + " " + horaStr + ":00";
             Timestamp fechaCita = Timestamp.valueOf(fechaHoraStr);
+
+            // Validar que la fecha no sea en el pasado
+            Timestamp ahora = new Timestamp(System.currentTimeMillis());
+            if (fechaCita.before(ahora)) {
+                request.setAttribute("error", "No se pueden programar citas en el pasado. Seleccione una fecha y hora futuras");
+                mostrarFormularioCrear(request, response);
+                return;
+            }
 
             // Crear objeto Cita
             Cita nuevaCita = new Cita();
@@ -507,18 +535,80 @@ public class CitaServlet extends HttpServlet {
             HttpSession session = request.getSession();
             Integer vetId = (Integer) session.getAttribute("userId");
 
+            // Validar sesión
+            if (vetId == null) {
+                request.setAttribute("error", "Sesión inválida");
+                response.sendRedirect("login.jsp");
+                return;
+            }
+
             // Obtener datos del formulario
-            int idCita = Integer.parseInt(request.getParameter("idCita"));
-            int idMascota = Integer.parseInt(request.getParameter("idMascota"));
-            int idSucursal = Integer.parseInt(request.getParameter("idSucursal"));
+            String idCitaStr = request.getParameter("idCita");
+            String idMascotaStr = request.getParameter("idMascota");
+            String idSucursalStr = request.getParameter("idSucursal");
             String fechaStr = request.getParameter("fecha");
             String horaStr = request.getParameter("hora");
             String estado = request.getParameter("estado");
             String observaciones = request.getParameter("observaciones");
 
+            // Validar campos obligatorios
+            if (!ValidacionUtil.noEstaVacio(idCitaStr) || !ValidacionUtil.noEstaVacio(idMascotaStr) ||
+                !ValidacionUtil.noEstaVacio(idSucursalStr) || !ValidacionUtil.noEstaVacio(fechaStr) ||
+                !ValidacionUtil.noEstaVacio(horaStr) || !ValidacionUtil.noEstaVacio(estado)) {
+                request.setAttribute("error", "Todos los campos obligatorios deben estar completos");
+                listarCitas(request, response);
+                return;
+            }
+
+            // Validar formato de fecha y hora
+            if (!ValidacionUtil.esFechaValida(fechaStr)) {
+                request.setAttribute("error", "Fecha inválida");
+                listarCitas(request, response);
+                return;
+            }
+
+            if (!ValidacionUtil.esHoraValida(horaStr)) {
+                request.setAttribute("error", "Hora inválida");
+                listarCitas(request, response);
+                return;
+            }
+
+            // Validar estado
+            if (!estado.equals("Programada") && !estado.equals("En Proceso") &&
+                !estado.equals("Completada") && !estado.equals("Cancelada")) {
+                request.setAttribute("error", "Estado inválido");
+                listarCitas(request, response);
+                return;
+            }
+
+            int idCita = Integer.parseInt(idCitaStr);
+            int idMascota = Integer.parseInt(idMascotaStr);
+            int idSucursal = Integer.parseInt(idSucursalStr);
+
+            // Validar IDs
+            if (!ValidacionUtil.esIdValido(idCita) || !ValidacionUtil.esIdValido(idMascota) ||
+                !ValidacionUtil.esIdValido(idSucursal)) {
+                request.setAttribute("error", "IDs inválidos");
+                listarCitas(request, response);
+                return;
+            }
+
             // Combinar fecha y hora
             String fechaHoraStr = fechaStr + " " + horaStr + ":00";
             Timestamp fechaCita = Timestamp.valueOf(fechaHoraStr);
+
+            // Validar que la fecha no sea en el pasado (solo para citas en estado "Programada")
+            if ("Programada".equals(estado)) {
+                Timestamp ahora = new Timestamp(System.currentTimeMillis());
+                if (fechaCita.before(ahora)) {
+                    request.setAttribute("error", "No se pueden programar citas en el pasado. Seleccione una fecha y hora futuras");
+                    listarCitas(request, response);
+                    return;
+                }
+            }
+
+            // Sanitizar observaciones
+            String observacionesSanitizadas = ValidacionUtil.sanitizar(observaciones != null ? observaciones : "");
 
             // Crear objeto Cita con los nuevos datos
             Cita cita = new Cita();
@@ -528,7 +618,7 @@ public class CitaServlet extends HttpServlet {
             cita.setIdSucursal(idSucursal);
             cita.setFechaCita(fechaCita);
             cita.setEstado(estado);
-            cita.setObservaciones(observaciones);
+            cita.setObservaciones(observacionesSanitizadas);
 
             boolean actualizada = citaDao.actualizarCita(cita);
 
@@ -539,6 +629,12 @@ public class CitaServlet extends HttpServlet {
                 request.setAttribute("error", "Error al actualizar la cita");
             }
 
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Formato de número inválido");
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("error", "Formato de fecha u hora inválido");
+            e.printStackTrace();
         } catch (Exception e) {
             request.setAttribute("error", "Error al procesar la cita: " + e.getMessage());
             e.printStackTrace();

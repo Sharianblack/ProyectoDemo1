@@ -35,7 +35,13 @@ public class UsuarioDao {
                 boolean usuarioActivo = (activoValue == 1);
                 String storedHash = rs.getString("PasswordHash");
 
-                System.out.println("📊 Usuario encontrado - Activo: " + activoValue + " (boolean: " + usuarioActivo + ")");
+                System.out.println("========== DEBUG LOGIN ==========");
+                System.out.println("Usuario: " + username);
+                System.out.println("Password ingresada: " + password);
+                System.out.println("Hash en BD: " + storedHash);
+                System.out.println("Longitud hash: " + (storedHash != null ? storedHash.length() : "NULL"));
+                System.out.println("Es BCrypt? " + PasswordUtil.isBCryptHash(storedHash));
+                System.out.println("Activo: " + activoValue + " (boolean: " + usuarioActivo + ")");
 
                 // 🔥 VERIFICAR CONTRASEÑA CON BCRYPT
                 boolean passwordMatch;
@@ -43,9 +49,11 @@ public class UsuarioDao {
                 if (PasswordUtil.isBCryptHash(storedHash)) {
                     // Hash BCrypt - verificar con BCrypt
                     passwordMatch = PasswordUtil.checkPassword(password, storedHash);
+                    System.out.println("Resultado BCrypt.checkPassword: " + passwordMatch);
                 } else {
                     // Hash antiguo (texto plano) - comparación directa
                     passwordMatch = password.equals(storedHash);
+                    System.out.println("Comparación texto plano: " + passwordMatch);
 
                     // 🔥 MIGRACIÓN AUTOMÁTICA: Si login exitoso, actualizar a BCrypt
                     if (passwordMatch) {
@@ -54,6 +62,9 @@ public class UsuarioDao {
                         System.out.println("🔄 Contraseña migrada a BCrypt para usuario: " + username);
                     }
                 }
+                
+                System.out.println("Resultado final passwordMatch: " + passwordMatch);
+                System.out.println("=================================");
 
                 if (passwordMatch) {
                     // Verificar si el usuario está activo
@@ -178,7 +189,7 @@ public class UsuarioDao {
 
         try {
             conn = ConexionBDD.getConnection();
-            String sql = "SELECT id_usuario, Nombre, Correo, Rol, Telefono, Direccion, activo, fecha_registro " +
+            String sql = "SELECT id_usuario, Nombre, Correo, PasswordHash, Rol, Telefono, Direccion, activo, fecha_registro " +
                     "FROM Usuarios WHERE id_usuario = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
@@ -189,6 +200,7 @@ public class UsuarioDao {
                 user.setId(rs.getInt("id_usuario"));
                 user.setNombre(rs.getString("Nombre"));
                 user.setCorreo(rs.getString("Correo"));
+                user.setPasswordHash(rs.getString("PasswordHash"));
                 user.setRol(rs.getString("Rol"));
                 user.setTelefono(rs.getString("Telefono"));
                 user.setDireccion(rs.getString("Direccion"));
@@ -482,9 +494,9 @@ public class UsuarioDao {
         return existe;
     }
 
-    // ========================================================================
+
     // PRIVADO: MIGRACIÓN AUTOMÁTICA A BCRYPT
-    // ========================================================================
+
     /**
      * Actualiza una contraseña antigua a BCrypt (migración automática)
      */
@@ -524,9 +536,7 @@ public class UsuarioDao {
         }
     }
 
-    // ========================================================================
     // MÉTODOS LEGACY - Mantener por compatibilidad
-    // ========================================================================
     @Deprecated
     public boolean registerUser(Usuario user) {
         return crearUsuario(user);

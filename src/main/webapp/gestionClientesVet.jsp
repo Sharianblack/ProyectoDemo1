@@ -57,18 +57,18 @@
 </head>
 <body>
 <nav class="navbar">
-  <h1>👥 Gestión de Clientes</h1>
+  <h1>Gestión de Clientes</h1>
   <div class="user-info">
     <span>Dr./Dra.: <strong><%= nombreVeterinario %></strong></span>
-    <span class="vet-badge">⚕️ VETERINARIO</span>
-    <a href="PIVeterinario.jsp" class="btn-volver">← Volver al Panel</a>
+    <span class="vet-badge">VETERINARIO</span>
+    <a href="PIVeterinario.jsp" class="btn-volver">Volver al Panel</a>
   </div>
 </nav>
 
 <div class="container">
   <div class="page-header">
-    <h2>📋 Lista de Clientes Registrados</h2>
-    <button class="btn-nuevo" onclick="abrirModalCrear()">➕ Nuevo Cliente</button>
+    <h2>Lista de Clientes Registrados</h2>
+    <button class="btn-nuevo" onclick="abrirModalCrear()">Nuevo Cliente</button>
   </div>
 
   <%-- Resto del HTML (Tablas, Modals, Scripts) se mantiene igual --%>
@@ -79,7 +79,7 @@
       <input
               type="text"
               name="criterio"
-              placeholder="🔍 Buscar por nombre, correo o teléfono..."
+              placeholder="Buscar por nombre, correo o teléfono..."
               value="<%= criterio != null ? criterio : "" %>">
       <button type="submit" class="btn-buscar">Buscar</button>
       <% if (criterio != null && !criterio.isEmpty()) { %>
@@ -90,13 +90,13 @@
 
   <% if (success != null) { %>
   <div class="alert alert-success">
-    ✅ <%= success %>
+    <%= success %>
   </div>
   <% } %>
 
   <% if (error != null) { %>
   <div class="alert alert-error">
-    ❌ <%= error %>
+    <%= error %>
   </div>
   <% } %>
 
@@ -124,27 +124,27 @@
         <td><%= c.getDireccion() != null && !c.getDireccion().isEmpty() ? c.getDireccion() : "-" %></td>
         <td>
           <% if (c.isActivo()) { %>
-          <span class="badge badge-activo">✅ Activo</span>
+          <span class="badge badge-activo">Activo</span>
           <% } else { %>
-          <span class="badge badge-inactivo">❌ Inactivo</span>
+          <span class="badge badge-inactivo">Inactivo</span>
           <% } %>
         </td>
         <td>
           <div class="action-buttons">
             <button class="btn-action btn-edit"
                     onclick="abrirModalEditar(<%= c.getId() %>, '<%= c.getNombre().replace("'", "\\'") %>', '<%= c.getCorreo() %>', '<%= c.getTelefono() != null ? c.getTelefono() : "" %>', '<%= c.getDireccion() != null ? c.getDireccion().replace("'", "\\'") : "" %>', <%= c.isActivo() %>)">
-              ✏️ Editar
+              Editar
             </button>
 
             <% if (c.isActivo()) { %>
             <button class="btn-action btn-toggle"
                     onclick="cambiarEstado(<%= c.getId() %>, false, '<%= c.getNombre().replace("'", "\\'") %>')">
-              🔒 Desactivar
+              Desactivar
             </button>
             <% } else { %>
             <button class="btn-action btn-activate"
                     onclick="cambiarEstado(<%= c.getId() %>, true, '<%= c.getNombre().replace("'", "\\'") %>')">
-              🔓 Activar
+              Activar
             </button>
             <% } %>
           </div>
@@ -159,7 +159,6 @@
     </p>
     <% } else { %>
     <div class="empty-state">
-      <div class="empty-state-icon">🔭</div>
       <h3>No hay clientes registrados</h3>
       <p>Comienza creando tu primer cliente con el botón "Nuevo Cliente"</p>
     </div>
@@ -170,7 +169,7 @@
 <div id="modalCrear" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>➕ Registrar Nuevo Cliente</h3>
+      <h3>Registrar Nuevo Cliente</h3>
       <span class="close" onclick="cerrarModal('modalCrear')">&times;</span>
     </div>
     
@@ -222,7 +221,7 @@
 
       <div class="form-actions">
         <button type="button" class="btn-cancel" onclick="cerrarModal('modalCrear')">Cancelar</button>
-        <button type="submit" class="btn-submit">✅ Crear Cliente</button>
+        <button type="submit" class="btn-submit">Crear Cliente</button>
       </div>
     </form>
   </div>
@@ -231,7 +230,7 @@
 <div id="modalEditar" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>✏️ Editar Cliente</h3>
+      <h3>Editar Cliente</h3>
       <span class="close" onclick="cerrarModal('modalEditar')">&times;</span>
     </div>
     <form action="VeterinarioClienteServlet" method="post">

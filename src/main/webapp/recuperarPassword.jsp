@@ -40,7 +40,6 @@
 <body>
 <div class="container">
     <div class="header">
-        <div class="header-icon">🔐</div>
         <h1>Nueva Contraseña</h1>
         <p>Crea una contraseña segura para tu cuenta</p>
     </div>
@@ -48,13 +47,13 @@
     <div class="content">
         <% if (error != null) { %>
         <div class="alert-error">
-            <strong>✗ Error:</strong><br>
+            <strong>Error:</strong><br>
             <%= error %>
         </div>
         <% } %>
 
         <div class="info-box">
-            <p><strong>⏰ Este enlace expirará en 1 hora</strong></p>
+            <p><strong>Este enlace expirará en 1 hora</strong></p>
             <p>Por seguridad, completa el proceso lo antes posible.</p>
         </div>
 
@@ -63,7 +62,7 @@
             <input type="hidden" name="token" value="<%= token %>">
 
             <div class="form-group">
-                <label for="nuevaPassword">🔒 Nueva Contraseña</label>
+                <label for="nuevaPassword">Nueva Contraseña</label>
                 <input
                         type="password"
                         id="nuevaPassword"
@@ -78,7 +77,7 @@
             </div>
 
             <div class="form-group">
-                <label for="confirmarPassword">🔒 Confirmar Contraseña</label>
+                <label for="confirmarPassword">Confirmar Contraseña</label>
                 <input
                         type="password"
                         id="confirmarPassword"
@@ -99,13 +98,13 @@
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
-                ✓ Cambiar Contraseña
+                Cambiar Contraseña
             </button>
         </form>
 
         <div class="footer-links">
             <p>
-                <a href="login.jsp">← Volver al Login</a>
+                <a href="login.jsp">Volver al Login</a>
             </p>
         </div>
     </div>
@@ -150,14 +149,14 @@
 
         if (password !== confirm) {
             e.preventDefault();
-            alert('❌ Las contraseñas no coinciden. Por favor, verifícalas.');
+            alert('Las contraseñas no coinciden. Por favor, verifícalas.');
             confirmInput.focus();
             return false;
         }
 
         if (password.length < 4) {
             e.preventDefault();
-            alert('❌ La contraseña debe tener al menos 4 caracteres.');
+            alert('La contraseña debe tener al menos 4 caracteres.');
             passwordInput.focus();
             return false;
         }

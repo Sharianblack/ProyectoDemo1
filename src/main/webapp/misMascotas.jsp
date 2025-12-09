@@ -36,11 +36,11 @@
 <body>
 
 <nav class="navbar">
-  <h1>🐾 Mis Mascotas</h1>
+  <h1>Mis Mascotas</h1>
   <div class="user-info">
     <span>Hola, <strong><%= nombreUsuario %></strong></span>
     <span class="info-badge">Cliente</span>
-    <a href="paginaInicio.jsp" class="logout-btn">← Volver</a>
+    <a href="paginaInicio.jsp" class="logout-btn">Volver</a>
   </div>
 </nav>
 
@@ -48,20 +48,20 @@
 
   <div class="section-header">
     <div class="section-title">
-      <h2>🐕 Mis Mascotas Registradas</h2>
+      <h2>Mis Mascotas Registradas</h2>
       <p>Gestiona el perfil de tus compañeros peludos</p>
     </div>
     <button class="btn-nuevo" onclick="abrirModalCrear()">
-      ➕ Nueva Mascota
+      Nueva Mascota
     </button>
   </div>
 
   <% if (success != null) { %>
-  <div class="alert alert-success">✅ <%= success %></div>
+  <div class="alert alert-success"><%= success %></div>
   <% } %>
 
   <% if (error != null) { %>
-  <div class="alert alert-error">❌ <%= error %></div>
+  <div class="alert alert-error"><%= error %></div>
   <% } %>
 
   <div class="mascotas-grid">
@@ -95,12 +95,12 @@
 
       <div class="card-footer">
         <button class="btn-icon btn-edit"
-                onclick="abrirModalEditar(<%= m.getIdMascota() %>, '<%= m.getNombre().replace("'", "\\'") %>', '<%= m.getEspecie() %>', '<%= m.getRaza() != null ? m.getRaza() : "" %>', '<%= m.getSexo() != null ? m.getSexo() : "" %>', '<%= m.getFechaNacimiento() != null ? m.getFechaNacimiento().toString() : "" %>')">
-          ✏️ Editar
+                onclick="abrirModalEditar(<%= m.getIdMascota() %>, '<%= m.getNombre().replace("'", "\\'"  ) %>', '<%= m.getEspecie() %>', '<%= m.getRaza() != null ? m.getRaza() : "" %>', '<%= m.getSexo() != null ? m.getSexo() : "" %>', '<%= m.getFechaNacimiento() != null ? m.getFechaNacimiento().toString() : "" %>')">
+          Editar
         </button>
         <button class="btn-icon btn-delete"
                 onclick="eliminarMascota(<%= m.getIdMascota() %>, '<%= m.getNombre().replace("'", "\\'") %>')">
-          🗑️ Eliminar
+          Eliminar
         </button>
       </div>
     </div>
@@ -108,7 +108,6 @@
     <% }
     } else { %>
     <div class="empty-state">
-      <div class="empty-icon">🦴</div>
       <div class="empty-text">
         <h3>Aún no tienes mascotas</h3>
         <p>Haz clic en "Nueva Mascota" para registrar a tu primer amigo.</p>
@@ -121,12 +120,12 @@
 <div id="modalCrear" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>➕ Registrar Mascota</h3>
+      <h3>Registrar Mascota</h3>
     </div>
     
     <% if (error != null && "crear".equals(request.getAttribute("mostrarModal"))) { %>
     <div class="alert alert-error" style="margin: 0 0 1rem 0;">
-      ❌ <%= error %>
+      <%= error %>
     </div>
     <% } %>
     
@@ -142,12 +141,12 @@
         <label>Especie *</label>
         <select name="especie">
           <option value="">Seleccionar...</option>
-          <option value="Perro">🐕 Perro</option>
-          <option value="Gato">🐈 Gato</option>
-          <option value="Ave">🐦 Ave</option>
-          <option value="Conejo">🐰 Conejo</option>
-          <option value="Hamster">🐹 Hamster</option>
-          <option value="Otro">🐾 Otro</option>
+          <option value="Perro">Perro</option>
+          <option value="Gato">Gato</option>
+          <option value="Ave">Ave</option>
+          <option value="Conejo">Conejo</option>
+          <option value="Hamster">Hamster</option>
+          <option value="Otro">Otro</option>
         </select>
       </div>
 
@@ -181,12 +180,12 @@
 <div id="modalEditar" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>✏️ Editar Mascota</h3>
+      <h3>Editar Mascota</h3>
     </div>
     
     <% if (error != null && "editar".equals(request.getAttribute("mostrarModal"))) { %>
     <div class="alert alert-error" style="margin: 0 0 1rem 0;">
-      ❌ <%= error %>
+      <%= error %>
     </div>
     <% } %>
     
@@ -202,12 +201,12 @@
       <div class="form-group">
         <label>Especie *</label>
         <select name="especie" id="editEspecie">
-          <option value="Perro">🐕 Perro</option>
-          <option value="Gato">🐈 Gato</option>
-          <option value="Ave">🐦 Ave</option>
-          <option value="Conejo">🐰 Conejo</option>
-          <option value="Hamster">🐹 Hamster</option>
-          <option value="Otro">🐾 Otro</option>
+          <option value="Perro">Perro</option>
+          <option value="Gato">Gato</option>
+          <option value="Ave">Ave</option>
+          <option value="Conejo">Conejo</option>
+          <option value="Hamster">Hamster</option>
+          <option value="Otro">Otro</option>
         </select>
       </div>
 

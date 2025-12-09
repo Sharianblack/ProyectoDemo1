@@ -30,9 +30,29 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Intento de login - Correo: " + correo);
 
         // Validar que los campos no estén vacíos
-        if (correo == null || correo.trim().isEmpty() ||
-                password == null || password.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Por favor complete todos los campos");
+        if (correo == null || correo.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "El campo de correo electrónico es obligatorio");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "El campo de contraseña es obligatorio");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+
+        // Validar formato de correo electrónico
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!correo.matches(emailRegex)) {
+            request.setAttribute("errorMessage", "Por favor ingrese un correo electrónico válido");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+            return;
+        }
+
+        // Validar longitud mínima de contraseña
+        if (password.length() < 4) {
+            request.setAttribute("errorMessage", "La contraseña debe tener al menos 4 caracteres");
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
